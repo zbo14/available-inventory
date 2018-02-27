@@ -71,7 +71,7 @@ class Product {
 
   forwardOutgoingOrders (product) {
     if (this.incomingOrders.length === 1 ||
-        this.outgoing > this.incoming) {  
+        this.outgoing > this.incoming) {
       this.outgoingOrders.forEach((order) => {
         if (order.start < product.start &&
             !product.hasOutgoingOrder(order)) {
