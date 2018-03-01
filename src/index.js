@@ -4,7 +4,15 @@
 
 const _ = require('./util')
 
-module.exports = ({incoming, outgoing, shelfLife}) => {
+/**
+ *
+ * @param  {number[]} incoming
+ * @param  {number[]} outgoing
+ * @param  {number} shelfLife
+ * @return {number[]}
+ */
+
+module.exports = (incoming, outgoing, shelfLife) => {
   if (!_.isNotEmptyArray(incoming)) {
     throw new TypeError('incoming should be non-empty array')
   }

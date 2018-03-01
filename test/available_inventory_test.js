@@ -10,7 +10,7 @@ const {successCases, failCases} = require('./testcases')
 describe('available-inventory', () => {
   successCases.forEach(({inputs, outputs}) => {
     it('calculates available inventory', () => {
-      const result = availableInventory(inputs)
+      const result = availableInventory(...inputs)
       expect(result).to.deep.equal(outputs)
     })
   })
@@ -18,7 +18,7 @@ describe('available-inventory', () => {
   failCases.forEach(({inputs, outputs}) => {
     it('fails to calculate available inventory', (done) => {
       try {
-        availableInventory(inputs)
+        availableInventory(...inputs)
       } catch (err) {
         expect(err.message).to.equal(outputs.message)
         done()
