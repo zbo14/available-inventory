@@ -4,6 +4,7 @@
   "description": "calculate available inventory from incoming orders, outgoing orders, and product shelf life",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "lint": "eslint src test",
     "test": "mocha --reporter spec"
   },
