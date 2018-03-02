@@ -7,22 +7,24 @@ const {describe, it} = require('mocha')
 const availableInventory = require('../src')
 const {successCases, failCases} = require('./testcases')
 
-describe('available-inventory', () => {
+describe('inventory', () => {
   successCases.forEach(({inputs, outputs}) => {
-    it('calculates available inventory', () => {
-      const result = availableInventory(...inputs)
-      expect(result).to.deep.equal(outputs)
+    it('calculates available inventory', (done) => {
+      availableInventory(...inputs, (err, result) => {
+        expect(err).to.equal(null)
+        expect(result).to.deep.equal(outputs)
+        done()
+      })
     })
   })
 
   failCases.forEach(({inputs, outputs}) => {
     it('fails to calculate available inventory', (done) => {
-      try {
-        availableInventory(...inputs)
-      } catch (err) {
+      availableInventory(...inputs, (err) => {
+        expect(err).to.be.an('error')
         expect(err.message).to.equal(outputs.message)
         done()
-      }
+      })
     })
   })
 })

@@ -1,5 +1,5 @@
 {
-  "name": "available-inventory",
+  "name": "inventory",
   "version": "1.0.0",
   "description": "calculate available inventory from incoming orders, outgoing orders, and product shelf life",
   "main": "index.js",

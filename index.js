@@ -4,10 +4,9 @@
 
 const availableInventory = require('./src')
 
-const results = availableInventory({
-  'incoming': [2, 1, 3, 4],
-  'outgoing': [1, 0, 1, 3],
-  'shelfLife': 3
-})
-
-console.log(results)
+availableInventory(
+  [5, 3, 0],
+  [2, 2, 0],
+  2,
+  console.log
+)

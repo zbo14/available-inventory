@@ -66,6 +66,14 @@ exports.successCases = [
       3
     ],
     'outputs': [0, 0, 0, 0]
+  },
+  {
+    'inputs': [
+      [2, 1, 0, 2],
+      [1, 2, 2, 1],
+      2
+    ],
+    'outputs': [0, 0, -2, 1]
   }
 ]
 
@@ -100,6 +108,14 @@ exports.failCases = [
       [2, 2, 0],
       -2
     ],
-    'outputs': new Error('shelfLife should be a positive number')
+    'outputs': new TypeError('shelfLife should be a positive number or non-empty array')
+  },
+  {
+    'inputs': [
+      [5, 3, 0],
+      [2, 2, 0],
+      []
+    ],
+    'outputs': new TypeError('shelfLife should be a positive number or non-empty array')
   }
 ]
