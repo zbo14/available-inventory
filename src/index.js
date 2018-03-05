@@ -24,12 +24,15 @@ module.exports = (size) => {
   const future = new Array(size)
   const prev = new Array(size)
   let i, j, v
-  const calcAvailable = (len) => {
+  const numAvailable = (i) => {
+    return entries[i].incoming - entries[i].outgoing + prev[i] + future[i]
+  }
+  const calcAvailable = (start, end) => {
     future.fill(0)
     prev.fill(0)
-    for (i = 1; i < len; i++) {
+    for (i = start; i < end; i++) {
       v = 0
-      for (j = i - 1; j >= 0 && entries[j].end > i; j--) {
+      for (j = i - 1; j >= start - 1 && entries[j].end > i; j--) {
         if (entries[j].incoming >= entries[j].outgoing && prev[j] >= entries[j].incoming) {
           prev[i] += Math.max(0, entries[j].incoming - v)
         } else {
@@ -38,40 +41,61 @@ module.exports = (size) => {
         v += entries[j].outgoing
       }
     }
-    for (i = len - 2; i >= 0; i--) {
+    for (i = end - 2; i >= start - 1; i--) {
       if (prev[i] - entries[i].outgoing + entries[i].incoming > 0) {
-        for (j = i + 1; j < len && entries[i].end > j; j++) {
+        for (j = i + 1; j < end && numAvailable(i) > 0 && entries[i].end > j; j++) {
           future[i] += Math.min(0, future[j] - entries[j].outgoing + entries[j].incoming)
         }
       }
     }
-    for (i = 0; i < len; i++) {
-      available[i] = entries[i].incoming - entries[i].outgoing + prev[i] + future[i]
+    for (i = start - 1; i < end; i++) {
+      available[i] = numAvailable(i)
     }
   }
   const update = ({index, incoming, outgoing, shelfLife}) => {
+    if (!_.isNonNegativeNumber(incoming)) {
+      inventory.emit('error', new Error('incoming should be a non-negative number'))
+      return false
+    }
+    if (!_.isNonNegativeNumber(outgoing)) {
+      inventory.emit('error', new Error('outgoing should be a non-negative number'))
+      return false
+    }
+    if (!_.isPositiveNumber(shelfLife)) {
+      inventory.emit('error', new Error('shelfLife should be a positive number'))
+      return false
+    }
     const entry = entries[index]
-    if (!_.isNegativeNumber(incoming)) {
-      entry.incoming = incoming
+    entry.incoming = incoming
+    entry.outgoing = outgoing
+    entry.end = entry.start + shelfLife
+    return true
+  }
+  const updates = (entries) => {
+    if (!_.isNotEmptyArray(entries)) {
+      return inventory.emit('error', new Error('entries should be a non-empty array'))
     }
-    if (!_.isNegativeNumber(outgoing)) {
-      entry.outgoing = outgoing
+    for (let i = 0; i < entries.length; i++) {
+      if (!update(entries[i])) return
     }
-    if (_.isPositiveNumber(shelfLife)) {
-      entry.end = entry.start + shelfLife
-    }
+    inventory.emit('updated')
   }
   on('update', (entry) => {
-    update(entry)
-    inventory.emit('updated')
+    if (update(entry)) inventory.emit('updated')
   })
-  on('updates', (updates) => {
-    updates.forEach(update)
-    inventory.emit('updated')
-  })
-  on('getAvailable', (len) => {
-    calcAvailable(len)
-    inventory.emit('gotAvailable', available.slice(0, len))
+  on('updates', updates)
+  on('getAvailable', (start, end) => {
+    if (!_.isPositiveNumber(start)) {
+      return inventory.emit('error', new Error('start should be a positive number'))
+    }
+    if (end <= start) {
+      return inventory.emit('error', new Error('end should be greater than start'))
+    }
+    if (end > size) {
+      return inventory.emit('error', new Error('end is out of range'))
+    }
+    calcAvailable(start, end)
+    inventory.emit('gotAvailable', available.slice(start - 1, end))
   })
   on('getEntries', () => {
     inventory.emit('gotEntries', entries.slice(0))

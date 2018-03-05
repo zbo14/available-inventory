@@ -11,7 +11,7 @@ inventory.emit('updates', [
     'index': 0,
     'incoming': 5,
     'outgoing': 4,
-    'shelfLife': 2
+    'shelfLife': 3
   },
   {
     'index': 1,
