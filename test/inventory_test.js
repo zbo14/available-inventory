@@ -4,27 +4,35 @@
 
 const {expect} = require('chai')
 const {describe, it} = require('mocha')
-const availableInventory = require('../src')
-const {successCases, failCases} = require('./testcases')
+const newInventory = require('../src')
+const {successCases} = require('./testcases')
+
+const inventory = newInventory(10)
 
 describe('inventory', () => {
-  successCases.forEach(({inputs, outputs}) => {
+  successCases.forEach(({entries, available}) => {
+    it('updates inventory', (done) => {
+      inventory.once('updated', done)
+      inventory.emit('updates', entries)
+    })
     it('calculates available inventory', (done) => {
-      availableInventory(...inputs, (err, result) => {
-        expect(err).to.equal(null)
-        expect(result).to.deep.equal(outputs)
+      inventory.once('gotAvailable', (result) => {
+        expect(result.slice(0, entries.length)).to.deep.equal(available)
         done()
       })
+      inventory.emit('getAvailable', available.length)
     })
   })
 
-  failCases.forEach(({inputs, outputs}) => {
-    it('fails to calculate available inventory', (done) => {
-      availableInventory(...inputs, (err) => {
-        expect(err).to.be.an('error')
-        expect(err.message).to.equal(outputs.message)
-        done()
-      })
-    })
-  })
+  // failCases.forEach(({inputs, outputs}) => {
+  //   it('fails to calculate available inventory', (done) => {
+  //     inventory.once('gotAvailable', (err, result) => {
+  //       expect(err).to.be.an('error')
+  //       expect(err.message).to.equal(outputs)
+  //       expect(result).to.equal(null)
+  //       done()
+  //     })
+  //     inventory.emit('getAvailable', ...inputs)
+  //   })
+  // })
 })

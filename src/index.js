@@ -3,115 +3,78 @@
 /* eslint-env node, es6 */
 
 const _ = require('./util')
+const EventEmitter = require('events')
 
-const entry = () => {
-  let idx = -1
-  return (ins, outs, shelfLife) => {
-    idx++
-    return {
-      'idx': idx,
-      'incoming': [{
-        'idx': idx,
-        'end': idx + shelfLife,
-        'qty': ins,
-        'rem': ins,
-        'ext': 0
-      }],
-      'outgoing': {
-        'qty': outs,
-        'rem': outs
+const newEntry = (index) => {
+  return {
+    'start': index,
+    'end': index,
+    'incoming': 0,
+    'outgoing': 0
+  }
+}
+
+module.exports = (size) => {
+  const inventory = new EventEmitter()
+  const on = (eventName, cb) => {
+    inventory.on(eventName, (...args) => setImmediate(cb, ...args))
+  }
+  const available = new Array(size)
+  const entries = new Array(size).fill(null).map((_, i) => newEntry(i))
+  const future = new Array(size)
+  const prev = new Array(size)
+  let i, j, v
+  const calcAvailable = (len) => {
+    future.fill(0)
+    prev.fill(0)
+    for (i = 1; i < len; i++) {
+      v = 0
+      for (j = i - 1; j >= 0 && entries[j].end > i; j--) {
+        if (entries[j].incoming >= entries[j].outgoing && prev[j] >= entries[j].incoming) {
+          prev[i] += Math.max(0, entries[j].incoming - v)
+        } else {
+          prev[i] += Math.max(0, prev[j] - entries[j].outgoing + entries[j].incoming - v)
+        }
+        v += entries[j].outgoing
       }
     }
-  }
-}
-
-const fulfill = ({incoming, outgoing}) => {
-  for (let i = 0; i < incoming.length && outgoing.rem !== 0; i++) {
-    if (incoming[i].rem < outgoing.rem) {
-      outgoing.rem -= incoming[i].rem
-      incoming[i].rem = 0
-    } else {
-      incoming[i].rem -= outgoing.rem
-      outgoing.rem = 0
-    }
-  }
-}
-
-const sortIncoming = (entry) => {
-  entry.incoming.sort((a, b) => a.idx < b.idx ? -1 : 1)
-}
-
-const pass = (e1, e2) => {
-  for (let i = 0; i < e1.incoming.length; i++) {
-    if (e1.incoming[i].qty > 0 && e1.incoming[i].end !== e2.idx) {
-      e2.incoming.push(e1.incoming[i])
-    }
-  }
-}
-
-const available = ({idx, incoming, outgoing}) => {
-  return incoming.reduce((acc, order) => {
-    return idx <= order.idx ? acc + order.rem + order.ext : acc + order.rem
-  }, -outgoing.rem)
-}
-
-const adjust = ({idx, incoming, outgoing}) => {
-  const today = incoming.find((order) => idx === order.idx)
-  let toAdd = today.rem > outgoing.qty ? outgoing.qty : 0
-  if (toAdd > 0) {
-    for (let i = 0; incoming[i].idx < idx && toAdd > 0; i++) {
-      if (incoming[i].rem < incoming[i].qty) {
-        if (incoming[i].qty > incoming[i].rem + toAdd) {
-          incoming[i].ext += toAdd
-          toAdd = 0
-        } else {
-          toAdd -= incoming[i].qty - incoming[i].rem
-          incoming[i].ext = incoming[i].qty - incoming[i].rem
+    for (i = len - 2; i >= 0; i--) {
+      if (prev[i] - entries[i].outgoing + entries[i].incoming > 0) {
+        for (j = i + 1; j < len && entries[i].end > j; j++) {
+          future[i] += Math.min(0, future[j] - entries[j].outgoing + entries[j].incoming)
         }
       }
     }
-  }
-}
-
-module.exports = (incoming, outgoing, shelfLife, cb) => {
-  if (!_.isNotEmptyArray(incoming)) {
-    return setImmediate(cb, new TypeError('incoming should be non-empty array'))
-  }
-  if (!_.isNotEmptyArray(outgoing)) {
-    return setImmediate(cb, new TypeError('outgoing sould be non-empty array'))
-  }
-  if (incoming.length !== outgoing.length) {
-    return setImmediate(cb, new Error('incoming and outgoing should have same length'))
-  }
-  let shelfLives
-  if (_.isPositiveNumber(shelfLife)) {
-    shelfLives = new Array(incoming.length).fill(shelfLife)
-  } else if (_.isNotEmptyArray(shelfLife)) {
-    if (incoming.length !== shelfLife.length) {
-      return setImmediate(cb, new TypeError('incoming and shelfLife should have same length'))
+    for (i = 0; i < len; i++) {
+      available[i] = entries[i].incoming - entries[i].outgoing + prev[i] + future[i]
     }
-    shelfLives = shelfLife
-  } else {
-    return setImmediate(cb, new TypeError('shelfLife should be a positive number or non-empty array'))
   }
-
-  const entries = _.zipWith(incoming, outgoing, shelfLives, entry())
-  fulfill(entries[0])
-  pass(entries[0], entries[1])
-
-  for (let i = 1; i + 1 < entries.length; i++) {
-    sortIncoming(entries[i])
-    fulfill(entries[i])
-    pass(entries[i], entries[i + 1])
+  const update = ({index, incoming, outgoing, shelfLife}) => {
+    const entry = entries[index]
+    if (!_.isNegativeNumber(incoming)) {
+      entry.incoming = incoming
+    }
+    if (!_.isNegativeNumber(outgoing)) {
+      entry.outgoing = outgoing
+    }
+    if (_.isPositiveNumber(shelfLife)) {
+      entry.end = entry.start + shelfLife
+    }
   }
-
-  const last = entries.length - 1
-  sortIncoming(entries[last])
-  fulfill(entries[last])
-
-  for (let i = entries.length - 1; i >= 0; i--) {
-    adjust(entries[i])
-  }
-
-  setImmediate(cb, null, entries.map(available))
+  on('update', (entry) => {
+    update(entry)
+    inventory.emit('updated')
+  })
+  on('updates', (updates) => {
+    updates.forEach(update)
+    inventory.emit('updated')
+  })
+  on('getAvailable', (len) => {
+    calcAvailable(len)
+    inventory.emit('gotAvailable', available.slice(0, len))
+  })
+  on('getEntries', () => {
+    inventory.emit('gotEntries', entries.slice(0))
+  })
+  return inventory
 }

@@ -6,7 +6,9 @@ const _ = require('lodash')
 
 _.mixin({
   'isNotEmptyArray': (arr) => _.isArray(arr) && !_.isEmpty(arr),
-  'isPositiveNumber': (num) => _.isNumber(num) && num > 0
+  'isNotEmptyObject': (obj) => _.isPlainObject(obj) && !_.isEmpty(obj),
+  'isPositiveNumber': (num) => _.isNumber(num) && num > 0,
+  'isNegativeNumber': (num) => _.isNumber(num) && num < 0
 })
 
 module.exports = _
