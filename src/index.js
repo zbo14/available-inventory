@@ -4,6 +4,7 @@
 
 const _ = require('./util')
 const EventEmitter = require('events')
+const {MongoClient} = require('mongodb')
 
 const newEntry = (index) => {
   return {
@@ -17,10 +18,10 @@ const newEntry = (index) => {
 /**
  * newInventory
  * @param  {number} numEntries
- * @return {EventEmitter} inventory
+ * @return {EventEmitter}
  */
 
-const newInventory = (numEntries) => {
+exports.newInventory = (numEntries) => {
   if (!_.isPositiveNumber(numEntries)) {
     throw new Error('numEntries should be a positive number')
   }
@@ -84,7 +85,7 @@ const newInventory = (numEntries) => {
     return true
   }
   const updates = (entries) => {
-    if (!_.isNotEmptyArray(entries)) {
+    if (!_.isNonEmptyArray(entries)) {
       return inventory.emit('error', new Error('entries should be a non-empty array'))
     }
     for (let i = 0; i < entries.length; i++) {
@@ -112,10 +113,82 @@ const newInventory = (numEntries) => {
     calcAvailable(start, end)
     inventory.emit('gotAvailable', available.slice(start - 1, end))
   })
-  on('getEntries', () => {
-    inventory.emit('gotEntries', entries.slice(0))
+  on('getEntries', (start, end) => {
+    inventory.emit('gotEntries', entries.slice(start - 1, end))
   })
   return inventory
 }
 
-module.exports = newInventory
+/**
+ * newInventoryDB
+ * @param  {Object} opts
+ * @return {EventEmitter}
+ */
+
+const convertEntry = (entry) => {
+  return {
+    'start': entry.index,
+    'end': entry.index + entry.shelfLife,
+    'incoming': entry.incoming,
+    'outgoing': entry.outgoing
+  }
+}
+
+exports.newInventoryDB = (opts) => {
+  if (!_.isNonEmptyObject(opts)) {
+    throw new Error('opts should be a non-empty object')
+  }
+  if (!_.isNonEmptyString(opts.name)) {
+    throw new Error('opts.name should be a non-empty string')
+  }
+  if (!_.isNonEmptyString(opts.url)) {
+    throw new Error('opts.url should be a non-empty string')
+  }
+  const inventory = new EventEmitter()
+  const on = (eventName, cb) => {
+    inventory.on(eventName, (...args) => setImmediate(cb, ...args))
+  }
+  MongoClient.connect(opts.url, (err, client) => {
+    if (err) throw err
+    const collection = client.db(opts.name).collection('inventory')
+    const update = (entry) => {
+      collection.update({start: entry.index}, convertEntry(entry), {upsert: true}, (err) => {
+        if (err) return inventory.emit('error', err)
+        inventory.emit('updated')
+      })
+    }
+    const getEntry = (index) => {
+      if (!_.isNonNegativeNumber(index)) {
+        return inventory.emit('error', new Error('index should be a non-negative number'))
+      }
+      collection.findOne({start: index}, (err, entry) => {
+        if (err) return inventory.emit('error', err)
+        inventory.emit('gotEntry', entry)
+      })
+    }
+    const getEntries = (min, max) => {
+      if (!_.isPositiveNumber(min)) {
+        return inventory.emit('error', new Error('min should be a positive number'))
+      }
+      if (!_.isPositiveNumber(max)) {
+        return inventory.emit('error', new Error('max should be a positive number'))
+      }
+      if (min >= max) {
+        return inventory.emit('error', new Error('max should be greater than min'))
+      }
+      collection.find({start: {$gte: min - 1, $lt: max}}, (err, cursor) => {
+        if (err) return inventory.emit('error', err)
+        cursor.toArray((err, entries) => {
+          if (err) return inventory.emit('error', err)
+          inventory.emit('gotEntries', entries)
+        })
+      })
+    }
+    on('update', update)
+    on('getEntry', getEntry)
+    // on('updates', updates)
+    on('getEntries', getEntries)
+    inventory.emit('started')
+  })
+  return inventory
+}

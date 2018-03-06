@@ -4,8 +4,10 @@
 
 const {expect} = require('chai')
 const {describe, it} = require('mocha')
-const newInventory = require('../src')
+const {newInventory} = require('../src')
+const {checkEntry} = require('./fixtures')
 const {cases, updateFails, calcFails, updatesFail} = require('./testcases')
+const _ = require('../src/util')
 
 const inventory = newInventory(10)
 
@@ -24,6 +26,13 @@ describe('inventory', () => {
     it('updates inventory', (done) => {
       inventory.once('updated', done)
       inventory.emit('updates', entries)
+    })
+    it('checks entries', (done) => {
+      inventory.once('gotEntries', (results) => {
+        _.zipWith(results, entries.slice(start - 1, end), checkEntry)
+        done()
+      })
+      inventory.emit('getEntries', start, end)
     })
     it('calculates available inventory', (done) => {
       inventory.once('gotAvailable', (result) => {
