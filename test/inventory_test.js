@@ -5,13 +5,22 @@
 const {expect} = require('chai')
 const {describe, it} = require('mocha')
 const newInventory = require('../src')
-const {successCases, updateFailCases, calcFailCases, updatesFailCase} = require('./testcases')
+const {cases, updateFails, calcFails, updatesFail} = require('./testcases')
 
-const size = 10
-const inventory = newInventory(size)
+const inventory = newInventory(10)
 
 describe('inventory', () => {
-  successCases.forEach(({entries, available, start, end}) => {
+  it('fails to create new inventory', (done) => {
+    try {
+      newInventory(0)
+    } catch (err) {
+      expect(err).to.be.an('error')
+      expect(err.message).to.equal('numEntries should be a positive number')
+      done()
+    }
+  })
+
+  cases.forEach(({entries, available, start, end}) => {
     it('updates inventory', (done) => {
       inventory.once('updated', done)
       inventory.emit('updates', entries)
@@ -25,7 +34,7 @@ describe('inventory', () => {
     })
   })
 
-  updateFailCases.forEach(({entry, error}) => {
+  updateFails.forEach(({entry, error}) => {
     it('fails to do single inventory update', (done) => {
       inventory.once('error', (err) => {
         expect(err).to.be.an('error')
@@ -36,7 +45,7 @@ describe('inventory', () => {
     })
   })
 
-  calcFailCases.forEach(({start, end, error}) => {
+  calcFails.forEach(({start, end, error}) => {
     it('fails to calculate available inventory', (done) => {
       inventory.once('error', (err) => {
         expect(err).to.be.an('error')
@@ -50,9 +59,9 @@ describe('inventory', () => {
   it('fails to do multiple inventory updates', (done) => {
     inventory.once('error', (err) => {
       expect(err).to.be.an('error')
-      expect(err.message).to.equal(updatesFailCase.error.message)
+      expect(err.message).to.equal(updatesFail.error.message)
       done()
     })
-    inventory.emit('updates', updatesFailCase.entries)
+    inventory.emit('updates', updatesFail.entries)
   })
 })

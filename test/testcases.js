@@ -2,7 +2,7 @@
 
 /* eslint-env node, es6 */
 
-const successCase1 = {
+const case1 = {
   'entries': [
     {
       'index': 0,
@@ -28,7 +28,7 @@ const successCase1 = {
   'end': 3
 }
 
-const successCase2 = {
+const case2 = {
   'entries': [
     {
       'index': 0,
@@ -54,7 +54,7 @@ const successCase2 = {
   'end': 3
 }
 
-const successCase3 = {
+const case3 = {
   'entries': [
     {
       'index': 0,
@@ -86,7 +86,7 @@ const successCase3 = {
   'end': 4
 }
 
-const successCase4 = {
+const case4 = {
   'entries': [
     {
       'index': 0,
@@ -118,7 +118,7 @@ const successCase4 = {
   'end': 4
 }
 
-const successCase5 = {
+const case5 = {
   'entries': [
     {
       'index': 0,
@@ -150,7 +150,7 @@ const successCase5 = {
   'end': 4
 }
 
-const successCase6 = {
+const case6 = {
   'entries': [
     {
       'index': 0,
@@ -182,16 +182,197 @@ const successCase6 = {
   'end': 4
 }
 
-exports.successCases = [
-  successCase1,
-  successCase2,
-  successCase3,
-  successCase4,
-  successCase5,
-  successCase6
+const case7 = {
+  'entries': [
+    {
+      'index': 0,
+      'incoming': 1,
+      'outgoing': 2,
+      'shelfLife': 3
+    },
+    {
+      'index': 1,
+      'incoming': 2,
+      'outgoing': 3,
+      'shelfLife': 2
+    },
+    {
+      'index': 2,
+      'incoming': 3,
+      'outgoing': 4,
+      'shelfLife': 2
+    },
+    {
+      'index': 3,
+      'incoming': 4,
+      'outgoing': 5,
+      'shelfLife': 2
+    }
+  ],
+  'available': [-1, -1, -1, -1],
+  'start': 1,
+  'end': 4
+}
+
+const case8 = {
+  'entries': [
+    {
+      'index': 0,
+      'incoming': 1,
+      'outgoing': 2,
+      'shelfLife': 3
+    },
+    {
+      'index': 1,
+      'incoming': 2,
+      'outgoing': 3,
+      'shelfLife': 3
+    },
+    {
+      'index': 2,
+      'incoming': 3,
+      'outgoing': 4,
+      'shelfLife': 2
+    },
+    {
+      'index': 3,
+      'incoming': 4,
+      'outgoing': 5,
+      'shelfLife': 2
+    }
+  ],
+  'available': [-1, -1, -1],
+  'start': 2,
+  'end': 4
+}
+
+const case9 = {
+  'entries': [
+    {
+      'index': 0,
+      'incoming': 2,
+      'outgoing': 0,
+      'shelfLife': 3
+    },
+    {
+      'index': 1,
+      'incoming': 1,
+      'outgoing': 1,
+      'shelfLife': 3
+    },
+    {
+      'index': 2,
+      'incoming': 3,
+      'outgoing': 4,
+      'shelfLife': 3
+    },
+    {
+      'index': 3,
+      'incoming': 5,
+      'outgoing': 4,
+      'shelfLife': 3
+    },
+    {
+      'index': 4,
+      'incoming': 4,
+      'outgoing': 6,
+      'shelfLife': 3
+    }
+  ],
+  'available': [0, 0, 0, 0, 0],
+  'start': 1,
+  'end': 5
+}
+
+const case10 = {
+  'entries': [
+    {
+      'index': 0,
+      'incoming': 1,
+      'outgoing': 0,
+      'shelfLife': 3
+    },
+    {
+      'index': 1,
+      'incoming': 1,
+      'outgoing': 1,
+      'shelfLife': 3
+    },
+    {
+      'index': 2,
+      'incoming': 3,
+      'outgoing': 4,
+      'shelfLife': 3
+    },
+    {
+      'index': 3,
+      'incoming': 5,
+      'outgoing': 4,
+      'shelfLife': 3
+    },
+    {
+      'index': 4,
+      'incoming': 4,
+      'outgoing': 6,
+      'shelfLife': 3
+    }
+  ],
+  'available': [0, 0, 0, 0, -1],
+  'start': 1,
+  'end': 5
+}
+
+const case11 = {
+  'entries': [
+    {
+      'index': 0,
+      'incoming': 3,
+      'outgoing': 1,
+      'shelfLife': 3
+    },
+    {
+      'index': 1,
+      'incoming': 1,
+      'outgoing': 2,
+      'shelfLife': 3
+    },
+    {
+      'index': 2,
+      'incoming': 2,
+      'outgoing': 0,
+      'shelfLife': 3
+    },
+    {
+      'index': 3,
+      'incoming': 3,
+      'outgoing': 1,
+      'shelfLife': 3
+    },
+    {
+      'index': 4,
+      'incoming': 4,
+      'outgoing': 5,
+      'shelfLife': 3
+    },
+    {
+      'index': 5,
+      'incoming': 2,
+      'outgoing': 1,
+      'shelfLife': 3
+    }
+  ],
+  'available': [1, 1, 2, 5, 4, 5],
+  'start': 1,
+  'end': 6
+}
+
+exports.cases = [
+  case1, case2, case3, case4,
+  case5, case6, case7, case8,
+  case9, case10, case11
 ]
 
-const updateFailCase1 = {
+const updateFail1 = {
   'entry': {
     'index': 0,
     'incoming': -5,
@@ -201,7 +382,7 @@ const updateFailCase1 = {
   'error': new Error('incoming should be a non-negative number')
 }
 
-const updateFailCase2 = {
+const updateFail2 = {
   'entry': {
     'index': 0,
     'incoming': 5,
@@ -211,7 +392,7 @@ const updateFailCase2 = {
   'error': new Error('outgoing should be a non-negative number')
 }
 
-const updateFailCase3 = {
+const updateFail3 = {
   'entry': {
     'index': 0,
     'incoming': 5,
@@ -221,37 +402,44 @@ const updateFailCase3 = {
   'error': new Error('shelfLife should be a positive number')
 }
 
-exports.updateFailCases = [
-  updateFailCase1,
-  updateFailCase2,
-  updateFailCase3
+exports.updateFails = [
+  updateFail1,
+  updateFail2,
+  updateFail3
 ]
 
-const calcFailCase1 = {
+const calcFail1 = {
   'start': 0,
   'end': 3,
   'error': new Error('start should be a positive number')
 }
 
-const calcFailCase2 = {
+const calcFail2 = {
   'start': 3,
   'end': 1,
   'error': new Error('end should be greater than start')
 }
 
-const calcFailCase3 = {
+const calcFail3 = {
   'start': 1,
   'end': 11,
   'error': new Error('end is out of range')
 }
 
-exports.calcFailCases = [
-  calcFailCase1,
-  calcFailCase2,
-  calcFailCase3
+const calcFail4 = {
+  'start': 1,
+  'end': 0,
+  'error': new Error('end should be a positive number')
+}
+
+exports.calcFails = [
+  calcFail1,
+  calcFail2,
+  calcFail3,
+  calcFail4
 ]
 
-exports.updatesFailCase = {
+exports.updatesFail = {
   'entries': [],
   'error': new Error('entries should be a non-empty array')
 }

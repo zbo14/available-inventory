@@ -14,15 +14,24 @@ const newEntry = (index) => {
   }
 }
 
-module.exports = (size) => {
+/**
+ * newInventory
+ * @param  {number} numEntries
+ * @return {EventEmitter} inventory
+ */
+
+const newInventory = (numEntries) => {
+  if (!_.isPositiveNumber(numEntries)) {
+    throw new Error('numEntries should be a positive number')
+  }
   const inventory = new EventEmitter()
   const on = (eventName, cb) => {
     inventory.on(eventName, (...args) => setImmediate(cb, ...args))
   }
-  const available = new Array(size)
-  const entries = new Array(size).fill(null).map((_, i) => newEntry(i))
-  const future = new Array(size)
-  const prev = new Array(size)
+  const available = new Array(numEntries)
+  const entries = new Array(numEntries).fill(null).map((_, i) => newEntry(i))
+  const future = new Array(numEntries)
+  const prev = new Array(numEntries)
   let i, j, v
   const numAvailable = (i) => {
     return entries[i].incoming - entries[i].outgoing + prev[i] + future[i]
@@ -45,6 +54,9 @@ module.exports = (size) => {
       if (prev[i] - entries[i].outgoing + entries[i].incoming > 0) {
         for (j = i + 1; j < end && numAvailable(i) > 0 && entries[i].end > j; j++) {
           future[i] += Math.min(0, future[j] - entries[j].outgoing + entries[j].incoming)
+          if (entries[j].incoming + prev[j] < entries[j].outgoing) {
+            future[i] += prev[j]
+          }
         }
       }
     }
@@ -88,11 +100,14 @@ module.exports = (size) => {
     if (!_.isPositiveNumber(start)) {
       return inventory.emit('error', new Error('start should be a positive number'))
     }
+    if (!_.isPositiveNumber(end)) {
+      return inventory.emit('error', new Error('end should be a positive number'))
+    }
+    if (end > numEntries) {
+      return inventory.emit('error', new Error('end is out of range'))
+    }
     if (end <= start) {
       return inventory.emit('error', new Error('end should be greater than start'))
-    }
-    if (end > size) {
-      return inventory.emit('error', new Error('end is out of range'))
     }
     calcAvailable(start, end)
     inventory.emit('gotAvailable', available.slice(start - 1, end))
@@ -102,3 +117,5 @@ module.exports = (size) => {
   })
   return inventory
 }
+
+module.exports = newInventory
