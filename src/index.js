@@ -3,17 +3,10 @@
 /* eslint-env node, es6 */
 
 const _ = require('./util')
+const {convertEntry, newEntry} = require('./entry')
 const EventEmitter = require('events')
 const {MongoClient} = require('mongodb')
-
-const newEntry = (index) => {
-  return {
-    'start': index,
-    'end': index,
-    'incoming': 0,
-    'outgoing': 0
-  }
-}
+const validator = require('./validator')
 
 /**
  * newInventory
@@ -33,16 +26,24 @@ exports.newInventory = (numEntries) => {
   const entries = new Array(numEntries).fill(null).map((_, i) => newEntry(i))
   const future = new Array(numEntries)
   const prev = new Array(numEntries)
-  let i, j, v
   const numAvailable = (i) => {
     return entries[i].incoming - entries[i].outgoing + prev[i] + future[i]
   }
-  const calcAvailable = (start, end) => {
+  const validEntry = validator.entry(inventory)
+  const validEntries = validator.entries(inventory, validEntry)
+  const validRange = validator.range(inventory, numEntries)
+  const getEntries = (min, max) => {
+    if (!validRange(min, max)) return
+    inventory.emit('gotEntries', entries.slice(min, max))
+  }
+  let i, j, v
+  const getAvailable = (start, end) => {
+    if (!validRange(start, end)) return
     future.fill(0)
     prev.fill(0)
-    for (i = start; i < end; i++) {
+    for (i = start + 1; i < end; i++) {
       v = 0
-      for (j = i - 1; j >= start - 1 && entries[j].end > i; j--) {
+      for (j = i - 1; j >= start && entries[j].end > i; j--) {
         if (entries[j].incoming >= entries[j].outgoing && prev[j] >= entries[j].incoming) {
           prev[i] += Math.max(0, entries[j].incoming - v)
         } else {
@@ -51,7 +52,7 @@ exports.newInventory = (numEntries) => {
         v += entries[j].outgoing
       }
     }
-    for (i = end - 2; i >= start - 1; i--) {
+    for (i = end - 2; i >= start; i--) {
       if (prev[i] - entries[i].outgoing + entries[i].incoming > 0) {
         for (j = i + 1; j < end && numAvailable(i) > 0 && entries[i].end > j; j++) {
           future[i] += Math.min(0, future[j] - entries[j].outgoing + entries[j].incoming)
@@ -61,61 +62,31 @@ exports.newInventory = (numEntries) => {
         }
       }
     }
-    for (i = start - 1; i < end; i++) {
+    for (i = start; i < end; i++) {
       available[i] = numAvailable(i)
     }
+    inventory.emit('gotAvailable', available.slice(start, end))
   }
-  const update = ({index, incoming, outgoing, shelfLife}) => {
-    if (!_.isNonNegativeNumber(incoming)) {
-      inventory.emit('error', new Error('incoming should be a non-negative number'))
-      return false
-    }
-    if (!_.isNonNegativeNumber(outgoing)) {
-      inventory.emit('error', new Error('outgoing should be a non-negative number'))
-      return false
-    }
-    if (!_.isPositiveNumber(shelfLife)) {
-      inventory.emit('error', new Error('shelfLife should be a positive number'))
-      return false
-    }
-    const entry = entries[index]
-    entry.incoming = incoming
-    entry.outgoing = outgoing
-    entry.end = entry.start + shelfLife
-    return true
+  const doUpdate = (entry) => {
+    const index = entry.index
+    entries[index].incoming = entry.incoming
+    entries[index].outgoing = entry.outgoing
+    entries[index].end = index + entry.shelfLife
   }
-  const updates = (entries) => {
-    if (!_.isNonEmptyArray(entries)) {
-      return inventory.emit('error', new Error('entries should be a non-empty array'))
-    }
-    for (let i = 0; i < entries.length; i++) {
-      if (!update(entries[i])) return
-    }
+  const update = (entry) => {
+    if (!validEntry(entry)) return
+    doUpdate(entry)
     inventory.emit('updated')
   }
-  on('update', (entry) => {
-    if (update(entry)) inventory.emit('updated')
-  })
+  const updates = (entries) => {
+    if (!validEntries(entries)) return
+    entries.forEach(doUpdate)
+    inventory.emit('updated')
+  }
+  on('getAvailable', getAvailable)
+  on('getEntries', getEntries)
+  on('update', update)
   on('updates', updates)
-  on('getAvailable', (start, end) => {
-    if (!_.isPositiveNumber(start)) {
-      return inventory.emit('error', new Error('start should be a positive number'))
-    }
-    if (!_.isPositiveNumber(end)) {
-      return inventory.emit('error', new Error('end should be a positive number'))
-    }
-    if (end > numEntries) {
-      return inventory.emit('error', new Error('end is out of range'))
-    }
-    if (end <= start) {
-      return inventory.emit('error', new Error('end should be greater than start'))
-    }
-    calcAvailable(start, end)
-    inventory.emit('gotAvailable', available.slice(start - 1, end))
-  })
-  on('getEntries', (start, end) => {
-    inventory.emit('gotEntries', entries.slice(start - 1, end))
-  })
   return inventory
 }
 
@@ -124,15 +95,6 @@ exports.newInventory = (numEntries) => {
  * @param  {Object} opts
  * @return {EventEmitter}
  */
-
-const convertEntry = (entry) => {
-  return {
-    'start': entry.index,
-    'end': entry.index + entry.shelfLife,
-    'incoming': entry.incoming,
-    'outgoing': entry.outgoing
-  }
-}
 
 exports.newInventoryDB = (opts) => {
   if (!_.isNonEmptyObject(opts)) {
@@ -149,10 +111,24 @@ exports.newInventoryDB = (opts) => {
     inventory.on(eventName, (...args) => setImmediate(cb, ...args))
   }
   MongoClient.connect(opts.url, (err, client) => {
-    if (err) throw err
+    if (err) return inventory.emit('error', err)
     const collection = client.db(opts.name).collection('inventory')
+    const validEntry = validator.entry(inventory)
+    const validEntries = validator.entries(inventory, validEntry)
+    const validRange = validator.range(inventory)
     const update = (entry) => {
-      collection.update({start: entry.index}, convertEntry(entry), {upsert: true}, (err) => {
+      if (!validEntry(entry)) return
+      collection.updateOne({start: entry.index}, {$set: convertEntry(entry)}, {upsert: true}, (err) => {
+        if (err) return inventory.emit('error', err)
+        inventory.emit('updated')
+      })
+    }
+    const updates = (entries) => {
+      if (!validEntries(entries)) return
+      const writes = entries.map((entry) => {
+        return {updateOne: {filter: {start: entry.index}, update: {$set: convertEntry(entry)}, upsert: true}}
+      })
+      collection.bulkWrite(writes, (err) => {
         if (err) return inventory.emit('error', err)
         inventory.emit('updated')
       })
@@ -167,16 +143,8 @@ exports.newInventoryDB = (opts) => {
       })
     }
     const getEntries = (min, max) => {
-      if (!_.isPositiveNumber(min)) {
-        return inventory.emit('error', new Error('min should be a positive number'))
-      }
-      if (!_.isPositiveNumber(max)) {
-        return inventory.emit('error', new Error('max should be a positive number'))
-      }
-      if (min >= max) {
-        return inventory.emit('error', new Error('max should be greater than min'))
-      }
-      collection.find({start: {$gte: min - 1, $lt: max}}, (err, cursor) => {
+      if (!validRange(min, max)) return
+      collection.find({start: {$gte: min, $lt: max}}, (err, cursor) => {
         if (err) return inventory.emit('error', err)
         cursor.toArray((err, entries) => {
           if (err) return inventory.emit('error', err)
@@ -184,11 +152,14 @@ exports.newInventoryDB = (opts) => {
         })
       })
     }
-    on('update', update)
     on('getEntry', getEntry)
-    // on('updates', updates)
     on('getEntries', getEntries)
-    inventory.emit('started')
+    on('update', update)
+    on('updates', updates)
+    collection.deleteMany({}, (err) => {
+      if (err) return inventory.emit('error', err)
+      inventory.emit('started')
+    })
   })
   return inventory
 }

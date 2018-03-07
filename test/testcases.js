@@ -24,7 +24,7 @@ const case1 = {
     }
   ],
   'available': [3, 4, 3],
-  'start': 1,
+  'start': 0,
   'end': 3
 }
 
@@ -50,7 +50,7 @@ const case2 = {
     }
   ],
   'available': [1, 1, 0],
-  'start': 1,
+  'start': 0,
   'end': 3
 }
 
@@ -82,7 +82,7 @@ const case3 = {
     }
   ],
   'available': [1, 2, 2, 4],
-  'start': 1,
+  'start': 0,
   'end': 4
 }
 
@@ -114,7 +114,7 @@ const case4 = {
     }
   ],
   'available': [1, 2, 2, 4],
-  'start': 1,
+  'start': 0,
   'end': 4
 }
 
@@ -146,7 +146,7 @@ const case5 = {
     }
   ],
   'available': [0, 0, -1, 1],
-  'start': 1,
+  'start': 0,
   'end': 4
 }
 
@@ -178,7 +178,7 @@ const case6 = {
     }
   ],
   'available': [0, 0, -1, 1],
-  'start': 1,
+  'start': 0,
   'end': 4
 }
 
@@ -210,7 +210,7 @@ const case7 = {
     }
   ],
   'available': [-1, -1, -1, -1],
-  'start': 1,
+  'start': 0,
   'end': 4
 }
 
@@ -242,7 +242,7 @@ const case8 = {
     }
   ],
   'available': [-1, -1, -1],
-  'start': 2,
+  'start': 1,
   'end': 4
 }
 
@@ -280,7 +280,7 @@ const case9 = {
     }
   ],
   'available': [0, 0, 0, 0, 0],
-  'start': 1,
+  'start': 0,
   'end': 5
 }
 
@@ -318,7 +318,7 @@ const case10 = {
     }
   ],
   'available': [0, 0, 0, 0, -1],
-  'start': 1,
+  'start': 0,
   'end': 5
 }
 
@@ -362,9 +362,41 @@ const case11 = {
     }
   ],
   'available': [1, 1, 2, 5, 4, 5],
-  'start': 1,
+  'start': 0,
   'end': 6
 }
+
+// const case12 = {
+//   'entries': [
+//     {
+//       'index': 0,
+//       'incoming': 5,
+//       'outgoing': 0,
+//       'shelfLife': 2
+//     },
+//     {
+//       'index': 1,
+//       'incoming': 2,
+//       'outgoing': 4,
+//       'shelfLife': 2
+//     },
+//     {
+//       'index': 2,
+//       'incoming': 1,
+//       'outgoing': 2,
+//       'shelfLife': 2
+//     },
+//     {
+//       'index': 3,
+//       'incoming': 3,
+//       'outgoing': 2,
+//       'shelfLife': 2
+//     }
+//   ],
+//   'available': [2, 2, 0, 1],
+//   'start': 0,
+//   'end': 4
+// }
 
 exports.cases = [
   case1, case2, case3, case4,
@@ -379,7 +411,7 @@ const updateFail1 = {
     'outgoing': 4,
     'shelfLife': 3
   },
-  'error': new Error('incoming should be a non-negative number')
+  'error': new Error('entry.incoming should be a non-negative number')
 }
 
 const updateFail2 = {
@@ -389,7 +421,7 @@ const updateFail2 = {
     'outgoing': -4,
     'shelfLife': 3
   },
-  'error': new Error('outgoing should be a non-negative number')
+  'error': new Error('entry.outgoing should be a non-negative number')
 }
 
 const updateFail3 = {
@@ -399,7 +431,7 @@ const updateFail3 = {
     'outgoing': 4,
     'shelfLife': 0
   },
-  'error': new Error('shelfLife should be a positive number')
+  'error': new Error('entry.shelfLife should be a positive number')
 }
 
 exports.updateFails = [
@@ -409,27 +441,27 @@ exports.updateFails = [
 ]
 
 const calcFail1 = {
-  'start': 0,
+  'start': -1,
   'end': 3,
-  'error': new Error('start should be a positive number')
+  'error': new Error('start should be a non-negative number')
 }
 
 const calcFail2 = {
-  'start': 3,
-  'end': 1,
-  'error': new Error('end should be greater than start')
+  'start': 0,
+  'end': 0,
+  'error': new Error('end should be a positive number')
 }
 
 const calcFail3 = {
-  'start': 1,
+  'start': 0,
   'end': 11,
   'error': new Error('end is out of range')
 }
 
 const calcFail4 = {
-  'start': 1,
-  'end': 0,
-  'error': new Error('end should be a positive number')
+  'start': 3,
+  'end': 1,
+  'error': new Error('end should be greater than start')
 }
 
 exports.calcFails = [

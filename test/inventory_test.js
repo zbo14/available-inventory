@@ -29,7 +29,7 @@ describe('inventory', () => {
     })
     it('checks entries', (done) => {
       inventory.once('gotEntries', (results) => {
-        _.zipWith(results, entries.slice(start - 1, end), checkEntry)
+        _.zipWith(results, entries.slice(start, end), checkEntry)
         done()
       })
       inventory.emit('getEntries', start, end)

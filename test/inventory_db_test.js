@@ -3,9 +3,10 @@
 /* eslint-env node, es6 */
 
 const {describe, it} = require('mocha')
+const {expect} = require('chai')
 const {newInventoryDB} = require('../src')
 const {checkEntry} = require('./fixtures')
-const {cases} = require('./testcases')
+const {cases, updateFails} = require('./testcases')
 const _ = require('../src/util')
 
 let inventoryDB
@@ -35,6 +36,17 @@ describe('inventory-db', () => {
         done()
       })
       inventoryDB.emit('getEntry', entry.index)
+    })
+  })
+
+  updateFails.forEach(({entry, error}) => {
+    it('fails to do single update', (done) => {
+      inventoryDB.once('error', (err) => {
+        expect(err).to.be.an('error')
+        expect(err.message).to.equal(error.message)
+        done()
+      })
+      inventoryDB.emit('update', entry)
     })
   })
 
