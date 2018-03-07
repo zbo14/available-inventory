@@ -35,6 +35,18 @@ exports.entries = (inventory, validEntry) => (entries) => {
   return true
 }
 
+exports.index = (inventory, numEntries = 0) => (index) => {
+  if (!_.isNonNegativeNumber(index)) {
+    inventory.emit('error', new Error('index should be a non-negative number'))
+    return false
+  }
+  if (numEntries > 0 && index > numEntries) {
+    inventory.emit('error', new Error('index is out of range'))
+    return false
+  }
+  return true
+}
+
 exports.range = (inventory, numEntries = 0) => (start, end) => {
   if (!_.isNonNegativeNumber(start)) {
     inventory.emit('error', new Error('start should be a non-negative number'))

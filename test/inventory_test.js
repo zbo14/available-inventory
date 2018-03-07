@@ -6,7 +6,7 @@ const {expect} = require('chai')
 const {describe, it} = require('mocha')
 const {newInventory} = require('../src')
 const {checkEntry} = require('./fixtures')
-const {cases, updateFails, calcFails, updatesFail} = require('./testcases')
+const {cases, updateFails, updatesFail, getAvailableFails} = require('./testcases')
 const _ = require('../src/util')
 
 const inventory = newInventory(10)
@@ -27,6 +27,15 @@ describe('inventory', () => {
       inventory.once('updated', done)
       inventory.emit('updates', entries)
     })
+    entries.forEach((entry, index) => {
+      it('checks each entry', (done) => {
+        inventory.once('gotEntry', (result) => {
+          checkEntry(result, entry)
+          done()
+        })
+        inventory.emit('getEntry', index)
+      })
+    })
     it('checks entries', (done) => {
       inventory.once('gotEntries', (results) => {
         _.zipWith(results, entries.slice(start, end), checkEntry)
@@ -34,7 +43,7 @@ describe('inventory', () => {
       })
       inventory.emit('getEntries', start, end)
     })
-    it('calculates available inventory', (done) => {
+    it('gets available inventory', (done) => {
       inventory.once('gotAvailable', (result) => {
         expect(result).to.deep.equal(available)
         done()
@@ -54,8 +63,8 @@ describe('inventory', () => {
     })
   })
 
-  calcFails.forEach(({start, end, error}) => {
-    it('fails to calculate available inventory', (done) => {
+  getAvailableFails.forEach(({start, end, error}) => {
+    it('fails to get available inventory', (done) => {
       inventory.once('error', (err) => {
         expect(err).to.be.an('error')
         expect(err.message).to.equal(error.message)

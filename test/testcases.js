@@ -440,35 +440,35 @@ exports.updateFails = [
   updateFail3
 ]
 
-const calcFail1 = {
+const getAvailableFail1 = {
   'start': -1,
   'end': 3,
   'error': new Error('start should be a non-negative number')
 }
 
-const calcFail2 = {
+const getAvailableFail2 = {
   'start': 0,
   'end': 0,
   'error': new Error('end should be a positive number')
 }
 
-const calcFail3 = {
-  'start': 0,
-  'end': 11,
-  'error': new Error('end is out of range')
-}
+// const getAvailableFail3 = {
+//   'start': 0,
+//   'end': 11,
+//   'error': new Error('end is out of range')
+// }
 
-const calcFail4 = {
+const getAvailableFail4 = {
   'start': 3,
   'end': 1,
   'error': new Error('end should be greater than start')
 }
 
-exports.calcFails = [
-  calcFail1,
-  calcFail2,
-  calcFail3,
-  calcFail4
+exports.getAvailableFails = [
+  getAvailableFail1,
+  getAvailableFail2,
+  // getAvailableFail3,
+  getAvailableFail4
 ]
 
 exports.updatesFail = {

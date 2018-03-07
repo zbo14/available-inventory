@@ -2,11 +2,12 @@
 
 /* eslint-env node, es6 */
 
-const _ = require('./util')
+const available = require('./available')
 const {convertEntry, newEntry} = require('./entry')
 const EventEmitter = require('events')
 const {MongoClient} = require('mongodb')
 const validator = require('./validator')
+const _ = require('./util')
 
 /**
  * newInventory
@@ -22,50 +23,22 @@ exports.newInventory = (numEntries) => {
   const on = (eventName, cb) => {
     inventory.on(eventName, (...args) => setImmediate(cb, ...args))
   }
-  const available = new Array(numEntries)
   const entries = new Array(numEntries).fill(null).map((_, i) => newEntry(i))
-  const future = new Array(numEntries)
-  const prev = new Array(numEntries)
-  const numAvailable = (i) => {
-    return entries[i].incoming - entries[i].outgoing + prev[i] + future[i]
-  }
   const validEntry = validator.entry(inventory)
   const validEntries = validator.entries(inventory, validEntry)
+  const validIndex = validator.index(inventory, numEntries)
   const validRange = validator.range(inventory, numEntries)
-  const getEntries = (min, max) => {
-    if (!validRange(min, max)) return
-    inventory.emit('gotEntries', entries.slice(min, max))
-  }
-  let i, j, v
   const getAvailable = (start, end) => {
     if (!validRange(start, end)) return
-    future.fill(0)
-    prev.fill(0)
-    for (i = start + 1; i < end; i++) {
-      v = 0
-      for (j = i - 1; j >= start && entries[j].end > i; j--) {
-        if (entries[j].incoming >= entries[j].outgoing && prev[j] >= entries[j].incoming) {
-          prev[i] += Math.max(0, entries[j].incoming - v)
-        } else {
-          prev[i] += Math.max(0, prev[j] - entries[j].outgoing + entries[j].incoming - v)
-        }
-        v += entries[j].outgoing
-      }
-    }
-    for (i = end - 2; i >= start; i--) {
-      if (prev[i] - entries[i].outgoing + entries[i].incoming > 0) {
-        for (j = i + 1; j < end && numAvailable(i) > 0 && entries[i].end > j; j++) {
-          future[i] += Math.min(0, future[j] - entries[j].outgoing + entries[j].incoming)
-          if (entries[j].incoming + prev[j] < entries[j].outgoing) {
-            future[i] += prev[j]
-          }
-        }
-      }
-    }
-    for (i = start; i < end; i++) {
-      available[i] = numAvailable(i)
-    }
-    inventory.emit('gotAvailable', available.slice(start, end))
+    inventory.emit('gotAvailable', available(entries.slice(start, end)))
+  }
+  const getEntry = (index) => {
+    if (!validIndex(index)) return
+    inventory.emit('gotEntry', entries[index])
+  }
+  const getEntries = (start, end) => {
+    if (!validRange(start, end)) return
+    inventory.emit('gotEntries', entries.slice(start, end))
   }
   const doUpdate = (entry) => {
     const index = entry.index
@@ -84,6 +57,7 @@ exports.newInventory = (numEntries) => {
     inventory.emit('updated')
   }
   on('getAvailable', getAvailable)
+  on('getEntry', getEntry)
   on('getEntries', getEntries)
   on('update', update)
   on('updates', updates)
@@ -115,7 +89,31 @@ exports.newInventoryDB = (opts) => {
     const collection = client.db(opts.name).collection('inventory')
     const validEntry = validator.entry(inventory)
     const validEntries = validator.entries(inventory, validEntry)
+    const validIndex = validator.index(inventory)
     const validRange = validator.range(inventory)
+    const getAvailable = (start, end) => {
+      inventory.once('gotEntries', (entries) => {
+        inventory.emit('gotAvailable', available(entries))
+      })
+      inventory.emit('getEntries', start, end)
+    }
+    const getEntry = (index) => {
+      if (!validIndex(index)) return
+      collection.findOne({start: index}, (err, entry) => {
+        if (err) return inventory.emit('error', err)
+        inventory.emit('gotEntry', entry)
+      })
+    }
+    const getEntries = (start, end) => {
+      if (!validRange(start, end)) return
+      collection.find({start: {$gte: start, $lt: end}}, (err, cursor) => {
+        if (err) return inventory.emit('error', err)
+        cursor.toArray((err, entries) => {
+          if (err) return inventory.emit('error', err)
+          inventory.emit('gotEntries', entries)
+        })
+      })
+    }
     const update = (entry) => {
       if (!validEntry(entry)) return
       collection.updateOne({start: entry.index}, {$set: convertEntry(entry)}, {upsert: true}, (err) => {
@@ -133,25 +131,7 @@ exports.newInventoryDB = (opts) => {
         inventory.emit('updated')
       })
     }
-    const getEntry = (index) => {
-      if (!_.isNonNegativeNumber(index)) {
-        return inventory.emit('error', new Error('index should be a non-negative number'))
-      }
-      collection.findOne({start: index}, (err, entry) => {
-        if (err) return inventory.emit('error', err)
-        inventory.emit('gotEntry', entry)
-      })
-    }
-    const getEntries = (min, max) => {
-      if (!validRange(min, max)) return
-      collection.find({start: {$gte: min, $lt: max}}, (err, cursor) => {
-        if (err) return inventory.emit('error', err)
-        cursor.toArray((err, entries) => {
-          if (err) return inventory.emit('error', err)
-          inventory.emit('gotEntries', entries)
-        })
-      })
-    }
+    on('getAvailable', getAvailable)
     on('getEntry', getEntry)
     on('getEntries', getEntries)
     on('update', update)
