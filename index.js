@@ -10,25 +10,25 @@ inventory.emit('updates', [
   {
     'index': 0,
     'incoming': 5,
-    'outgoing': 0,
-    'shelfLife': 2
+    'outgoing': 4,
+    'shelfLife': 3
   },
   {
     'index': 1,
-    'incoming': 2,
+    'incoming': 3,
     'outgoing': 4,
     'shelfLife': 2
   },
   {
     'index': 2,
-    'incoming': 1,
-    'outgoing': 2,
+    'incoming': 2,
+    'outgoing': 3,
     'shelfLife': 2
   },
   {
     'index': 3,
-    'incoming': 3,
-    'outgoing': 2,
+    'incoming': 2,
+    'outgoing': 1,
     'shelfLife': 2
   }
 ])

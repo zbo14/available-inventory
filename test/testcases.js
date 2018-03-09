@@ -361,47 +361,74 @@ const case11 = {
       'shelfLife': 3
     }
   ],
-  'available': [1, 1, 2, 5, 4, 5],
+  'available': [1, 1, 3, 4, 4, 5],
   'start': 0,
   'end': 6
 }
 
-// const case12 = {
-//   'entries': [
-//     {
-//       'index': 0,
-//       'incoming': 5,
-//       'outgoing': 0,
-//       'shelfLife': 2
-//     },
-//     {
-//       'index': 1,
-//       'incoming': 2,
-//       'outgoing': 4,
-//       'shelfLife': 2
-//     },
-//     {
-//       'index': 2,
-//       'incoming': 1,
-//       'outgoing': 2,
-//       'shelfLife': 2
-//     },
-//     {
-//       'index': 3,
-//       'incoming': 3,
-//       'outgoing': 2,
-//       'shelfLife': 2
-//     }
-//   ],
-//   'available': [2, 2, 0, 1],
-//   'start': 0,
-//   'end': 4
-// }
+const case12 = {
+  'entries': [
+    {
+      'index': 0,
+      'incoming': 5,
+      'outgoing': 1,
+      'shelfLife': 2
+    },
+    {
+      'index': 1,
+      'incoming': 2,
+      'outgoing': 3,
+      'shelfLife': 2
+    },
+    {
+      'index': 2,
+      'incoming': 1,
+      'outgoing': 3,
+      'shelfLife': 2
+    }
+  ],
+  'available': [1, 1, 0],
+  'start': 0,
+  'end': 3
+}
+
+const case13 = {
+  'entries': [
+    {
+      'index': 0,
+      'incoming': 5,
+      'outgoing': 0,
+      'shelfLife': 2
+    },
+    {
+      'index': 1,
+      'incoming': 2,
+      'outgoing': 4,
+      'shelfLife': 2
+    },
+    {
+      'index': 2,
+      'incoming': 1,
+      'outgoing': 2,
+      'shelfLife': 2
+    },
+    {
+      'index': 3,
+      'incoming': 3,
+      'outgoing': 2,
+      'shelfLife': 2
+    }
+  ],
+  'available': [2, 2, 1, 2],
+  'start': 0,
+  'end': 4
+}
 
 exports.cases = [
   case1, case2, case3, case4,
   case5, case6, case7, case8,
-  case9, case10, case11
+  case9, case10, case11, case12,
+  case13
 ]
 
 const updateFail1 = {
