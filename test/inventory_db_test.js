@@ -6,14 +6,15 @@ const {describe, it} = require('mocha')
 const {expect} = require('chai')
 const {newInventoryDB} = require('../src')
 const {checkEntry} = require('./fixtures')
-const {getAvailableFails, cases, updateFails, updatesFail} = require('./testcases')
+const t = require('./testcases')
 const _ = require('../src/util')
 
 let inventoryDB
 
 const opts = {
   'name': 'test',
-  'url': 'mongodb://localhost:27017'
+  'url': 'mongodb://localhost:27017',
+  'numEntries': 10
 }
 
 describe('inventory-db', () => {
@@ -22,7 +23,19 @@ describe('inventory-db', () => {
     inventoryDB.once('started', done)
   })
 
-  cases.forEach(({entries, start, end, available}) => {
+  t.inventoryDBFails.forEach(({opts, error}) => {
+    it('fails to create inventory db', (done) => {
+      try {
+        newInventoryDB(opts)
+      } catch (err) {
+        expect(err).to.be.an('error')
+        expect(err.message).to.equal(error.message)
+        done()
+      }
+    })
+  })
+
+  t.cases.forEach(({entries, start, end, available}) => {
     entries.slice(start, end).forEach((entry) => {
       it('does single update', (done) => {
         inventoryDB.once('updated', done)
@@ -60,7 +73,7 @@ describe('inventory-db', () => {
     })
   })
 
-  updateFails.forEach(({entry, error}) => {
+  t.updateFails.forEach(({entry, error}) => {
     it('fails to do single update', (done) => {
       inventoryDB.once('error', (err) => {
         expect(err).to.be.an('error')
@@ -71,7 +84,7 @@ describe('inventory-db', () => {
     })
   })
 
-  getAvailableFails.forEach(({start, end, error}) => {
+  t.getAvailableFails.forEach(({start, end, error}) => {
     it('fails to get available inventory', (done) => {
       inventoryDB.once('error', (err) => {
         expect(err).to.be.an('error')
@@ -85,9 +98,9 @@ describe('inventory-db', () => {
   it('fails to do multiple updates', (done) => {
     inventoryDB.once('error', (err) => {
       expect(err).to.be.an('error')
-      expect(err.message).to.equal(updatesFail.error.message)
+      expect(err.message).to.equal(t.updatesFail.error.message)
       done()
     })
-    inventoryDB.emit('updates', updatesFail.entries)
+    inventoryDB.emit('updates', t.updatesFail.entries)
   })
 })

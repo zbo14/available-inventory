@@ -43,7 +43,7 @@ module.exports = (entries) => {
           incoming[i] += v
           incoming[j] -= v
           for (k = j; k < i; k++) {
-            available[k] -= v
+            if (available[k] > 0) available[k] -= Math.min(available[k], v)
           }
         }
       }

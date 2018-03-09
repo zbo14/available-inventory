@@ -80,6 +80,10 @@ exports.newInventoryDB = (opts) => {
   if (!_.isNonEmptyString(opts.url)) {
     throw new Error('opts.url should be a non-empty string')
   }
+  opts.numEntries = opts.numEntries || 0
+  if (!_.isNonNegativeNumber(opts.numEntries)) {
+    throw new Error('opts.numEntries should be a non-negative number')
+  }
   const inventory = new EventEmitter()
   const on = (eventName, cb) => {
     inventory.on(eventName, (...args) => setImmediate(cb, ...args))
@@ -89,8 +93,8 @@ exports.newInventoryDB = (opts) => {
     const collection = client.db(opts.name).collection('inventory')
     const validEntry = validator.entry(inventory)
     const validEntries = validator.entries(inventory, validEntry)
-    const validIndex = validator.index(inventory)
-    const validRange = validator.range(inventory)
+    const validIndex = validator.index(inventory, opts.numEntries)
+    const validRange = validator.range(inventory, opts.numEntries)
     const getAvailable = (start, end) => {
       inventory.once('gotEntries', (entries) => {
         inventory.emit('gotAvailable', available(entries))

@@ -479,11 +479,11 @@ const getAvailableFail2 = {
   'error': new Error('end should be a positive number')
 }
 
-// const getAvailableFail3 = {
-//   'start': 0,
-//   'end': 11,
-//   'error': new Error('end is out of range')
-// }
+const getAvailableFail3 = {
+  'start': 0,
+  'end': 11,
+  'error': new Error('end is out of range')
+}
 
 const getAvailableFail4 = {
   'start': 3,
@@ -494,7 +494,7 @@ const getAvailableFail4 = {
 exports.getAvailableFails = [
   getAvailableFail1,
   getAvailableFail2,
-  // getAvailableFail3,
+  getAvailableFail3,
   getAvailableFail4
 ]
 
@@ -502,3 +502,47 @@ exports.updatesFail = {
   'entries': [],
   'error': new Error('entries should be a non-empty array')
 }
+
+exports.inventoryFail = {
+  'numEntries': 0,
+  'error': new Error('numEntries should be a positive number')
+}
+
+const inventoryDBFail1 = {
+  'opts': {},
+  'error': new Error('opts should be a non-empty object')
+}
+
+const inventoryDBFail2 = {
+  'opts': {
+    'name': '',
+    'url': 'mongodb://localhost:27017',
+    'numEntries': 10
+  },
+  'error': new Error('opts.name should be a non-empty string')
+}
+
+const inventoryDBFail3 = {
+  'opts': {
+    'name': 'test',
+    'url': '',
+    'numEntries': 10
+  },
+  'error': new Error('opts.url should be a non-empty string')
+}
+
+const inventoryDBFail4 = {
+  'opts': {
+    'name': 'test',
+    'url': 'mongodb://localhost:27017',
+    'numEntries': -10
+  },
+  'error': new Error('opts.numEntries should be a non-negative number')
+}
+
+exports.inventoryDBFails = [
+  inventoryDBFail1,
+  inventoryDBFail2,
+  inventoryDBFail3,
+  inventoryDBFail4
+]

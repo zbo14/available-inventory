@@ -6,7 +6,7 @@ const {expect} = require('chai')
 const {describe, it} = require('mocha')
 const {newInventory} = require('../src')
 const {checkEntry} = require('./fixtures')
-const {cases, updateFails, updatesFail, getAvailableFails} = require('./testcases')
+const t = require('./testcases')
 const _ = require('../src/util')
 
 const inventory = newInventory(10)
@@ -14,15 +14,15 @@ const inventory = newInventory(10)
 describe('inventory', () => {
   it('fails to create new inventory', (done) => {
     try {
-      newInventory(0)
+      newInventory(t.inventoryFail.numEntries)
     } catch (err) {
       expect(err).to.be.an('error')
-      expect(err.message).to.equal('numEntries should be a positive number')
+      expect(err.message).to.equal(t.inventoryFail.error.message)
       done()
     }
   })
 
-  cases.forEach(({entries, available, start, end}) => {
+  t.cases.forEach(({entries, available, start, end}) => {
     it('updates inventory', (done) => {
       inventory.once('updated', done)
       inventory.emit('updates', entries)
@@ -52,7 +52,7 @@ describe('inventory', () => {
     })
   })
 
-  updateFails.forEach(({entry, error}) => {
+  t.updateFails.forEach(({entry, error}) => {
     it('fails to do single inventory update', (done) => {
       inventory.once('error', (err) => {
         expect(err).to.be.an('error')
@@ -63,7 +63,7 @@ describe('inventory', () => {
     })
   })
 
-  getAvailableFails.forEach(({start, end, error}) => {
+  t.getAvailableFails.forEach(({start, end, error}) => {
     it('fails to get available inventory', (done) => {
       inventory.once('error', (err) => {
         expect(err).to.be.an('error')
@@ -77,9 +77,9 @@ describe('inventory', () => {
   it('fails to do multiple inventory updates', (done) => {
     inventory.once('error', (err) => {
       expect(err).to.be.an('error')
-      expect(err.message).to.equal(updatesFail.error.message)
+      expect(err.message).to.equal(t.updatesFail.error.message)
       done()
     })
-    inventory.emit('updates', updatesFail.entries)
+    inventory.emit('updates', t.updatesFail.entries)
   })
 })
