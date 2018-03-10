@@ -4,7 +4,7 @@
 
 const _ = require('./util')
 
-exports.entry = (inventory) => (entry) => {
+exports.entry = inventory => entry => {
   if (!_.isNonEmptyObject(entry)) {
     inventory.emit('error', new Error('entry should be a non-empty object'))
     return false
@@ -24,7 +24,7 @@ exports.entry = (inventory) => (entry) => {
   return true
 }
 
-exports.entries = (inventory, validEntry) => (entries) => {
+exports.entries = (inventory, validEntry) => entries => {
   if (!_.isNonEmptyArray(entries)) {
     inventory.emit('error', new Error('entries should be a non-empty array'))
     return false
@@ -35,7 +35,7 @@ exports.entries = (inventory, validEntry) => (entries) => {
   return true
 }
 
-exports.index = (inventory, numEntries = 0) => (index) => {
+exports.index = (inventory, numEntries = 0) => index => {
   if (!_.isNonNegativeNumber(index)) {
     inventory.emit('error', new Error('index should be a non-negative number'))
     return false
