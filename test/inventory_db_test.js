@@ -27,6 +27,5 @@ describe('inventory-db', () => {
       }
     })
   })
-
   testOps(newInventoryDB(opts))
 })

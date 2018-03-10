@@ -482,7 +482,18 @@ exports.cases = [
   }
 ]
 
-exports.getAvailableFails = [
+exports.getEntryFails = [
+  {
+    index: -1,
+    error: new Error('index should be a non-negative number')
+  },
+  {
+    index: 11,
+    error: new Error('index is out of range')
+  }
+]
+
+exports.getEntriesFails = [
   {
     start: -1,
     end: 3,
@@ -506,6 +517,10 @@ exports.getAvailableFails = [
 ]
 
 exports.updateEntryFails = [
+  {
+    entry: {},
+    error: new Error('entry should be a non-empty object')
+  },
   {
     entry: {
       index: 0,

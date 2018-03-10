@@ -2,7 +2,7 @@
 
 /* eslint-env node, es6 */
 
-const {newInventory} = require('./src')
+const {newInventory} = require('../src')
 const inventory = newInventory(6)
 const entries = [
   {
@@ -43,9 +43,9 @@ const entries = [
   }
 ]
 
-inventory.emit('updateEntries', entries)
+inventory.once('updated', () => inventory.emit('getAvailable', 0, 6))
 inventory.once('gotAvailable', console.log)
-inventory.emit('getAvailable', 0, 6)
+inventory.emit('updateEntries', entries)
 
-// console.logs the availability for the 6 days:
+// console.logs the availability for the 6 steps:
 // [1, 1, 3, 4, 4, 5]

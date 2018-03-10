@@ -19,6 +19,5 @@ describe('inventory', () => {
       done()
     }
   })
-
   testOps(newInventory(10))
 })

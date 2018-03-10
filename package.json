@@ -1,11 +1,10 @@
 {
   "name": "inventory",
   "version": "1.0.0",
-  "description": "get available inventory from incoming orders, outgoing orders, and product shelf life",
-  "main": "index.js",
+  "description": "update entries with incoming orders, outgoing orders, and product shelf life and calculate available inventory",
   "scripts": {
-    "start": "node index.js",
     "lint": "eslint src test",
+    "start": "node example/inventory.js",
     "test": "nyc mocha --reporter spec"
   },
   "author": "Zachary Balder",
