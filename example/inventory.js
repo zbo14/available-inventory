@@ -43,7 +43,7 @@ const entries = [
   }
 ]
 
-inventory.once('updated', () => inventory.emit('getAvailable', 0, 6))
+inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 6))
 inventory.once('gotAvailable', console.log)
 inventory.emit('updateEntries', entries)
 

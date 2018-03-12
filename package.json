@@ -4,7 +4,7 @@
   "description": "update entries with incoming orders, outgoing orders, and product shelf life and calculate available inventory",
   "scripts": {
     "lint": "eslint src test",
-    "start": "node example/inventory.js",
+    "start": "node ./example/inventory.js",
     "test": "nyc mocha --reporter spec"
   },
   "author": "Zachary Balder",
@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.5",
-    "mongodb": "^3.0.4"
+    "mongodb": "^3.0.4",
+    "pg": "^7.4.1"
   }
 }

@@ -4,8 +4,10 @@
 
 const {newInventoryDB} = require('../src')
 const inventory = newInventoryDB({
+  db: 'mongodb',
   name: 'example',
-  url: 'mongodb://localhost:27017',
+  host: 'localhost',
+  port: 27017,
   numEntries: 4
 })
 
@@ -31,8 +33,11 @@ const entries = [
 ]
 
 inventory.once('started', () => {
-  inventory.once('updated', () => inventory.emit('getAvailable', 0, 4))
-  inventory.once('gotAvailable', console.log)
+  inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 4))
+  inventory.once('gotAvailable', available => {
+    console.log(available)
+    process.exit()
+  })
   inventory.emit('updateEntries', entries)
 })
 

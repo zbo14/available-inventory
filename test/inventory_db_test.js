@@ -9,10 +9,24 @@ const testOps = require('./fixtures')
 const t = require('./testcases')
 const _ = require('../src/util')
 
-const opts = {
-  name: 'test',
-  url: 'mongodb://localhost:27017',
-  numEntries: 10
+const host = 'localhost'
+const name = 'test'
+const numEntries = 10
+
+const mongoOpts = {
+  db: 'mongodb',
+  host,
+  name,
+  port: 27017,
+  numEntries
+}
+
+const postgresOpts = {
+  db: 'postgresql',
+  host,
+  name,
+  port: 5432,
+  numEntries
 }
 
 describe('inventory-db', () => {
@@ -27,5 +41,6 @@ describe('inventory-db', () => {
       }
     })
   })
-  testOps(newInventoryDB(opts))
+  testOps(newInventoryDB(mongoOpts))
+  testOps(newInventoryDB(postgresOpts))
 })

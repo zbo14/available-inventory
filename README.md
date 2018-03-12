@@ -57,7 +57,7 @@ const entries = [
   }
 ]
 
-inventory.once('updated', () => inventory.emit('getAvailable', 0, 6))
+inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 6))
 inventory.once('gotAvailable', console.log)
 inventory.emit('updateEntries', entries)
 
@@ -69,15 +69,17 @@ inventory.emit('updateEntries', entries)
 
 Update entries in mongodb and calculate available inventory over a 4-step period.
 
-Notice we only update 3 entries; the missing entry is presumed to have `{incoming: 0, outgoing: 0}`.
+Notice we only update 3 entries; the missing entry is assumed to have `{incoming: 0, outgoing: 0}`.
 
 For this example, mongod should be running on 'mongodb://localhost:27017'.
 
 ```js
 const {newInventoryDB} = require('../src')
 const inventory = newInventoryDB({
+  db: 'mongodb',
   name: 'example',
-  url: 'mongodb://localhost:27017',
+  host: 'localhost',
+  port: 27017,
   numEntries: 4
 })
 
@@ -103,8 +105,11 @@ const entries = [
 ]
 
 inventory.once('started', () => {
-  inventory.once('updated', () => inventory.emit('getAvailable', 0, 4))
-  inventory.once('gotAvailable', console.log)
+  inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 4))
+  inventory.once('gotAvailable', available => {
+    console.log(available)
+    process.exit()
+  })
   inventory.emit('updateEntries', entries)
 })
 

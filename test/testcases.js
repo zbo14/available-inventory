@@ -567,26 +567,62 @@ exports.inventoryDBFails = [
   },
   {
     opts: {
+      db: '',
+      name: 'test',
+      host: 'localhost',
+      port: 1024,
+      numEntries: 10
+    },
+    error: new Error('opts.db should be a non-empty string')
+  },
+  {
+    opts: {
+      db: 'mongodb',
       name: '',
-      url: 'mongodb://localhost:27017',
+      host: 'localhost',
+      port: 1024,
       numEntries: 10
     },
     error: new Error('opts.name should be a non-empty string')
   },
   {
     opts: {
+      db: 'mongodb',
       name: 'test',
-      url: '',
+      host: '',
+      port: 1024,
       numEntries: 10
     },
-    error: new Error('opts.url should be a non-empty string')
+    error: new Error('opts.host should be a non-empty string')
   },
   {
     opts: {
+      db: 'mongodb',
       name: 'test',
-      url: 'mongodb://localhost:27017',
+      host: 'localhost',
+      port: 1023,
+      numEntries: 10
+    },
+    error: new Error('opts.port should be a number > 1023')
+  },
+  {
+    opts: {
+      db: 'mongodb',
+      name: 'test',
+      host: 'localhost',
+      port: 1024,
       numEntries: -10
     },
     error: new Error('opts.numEntries should be a non-negative number')
+  },
+  {
+    opts: {
+      db: 'mysql',
+      name: 'test',
+      host: 'localhost',
+      port: 1024,
+      numEntries: 10
+    },
+    error: new Error('opts.db should be "mongodb" or "postgresql"')
   }
 ]

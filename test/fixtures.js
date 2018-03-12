@@ -22,7 +22,7 @@ module.exports = inventory => {
   _.each(t.cases, ({entries, available, start, end}) => {
     _.each(entries, entry => {
       it('updates entry', done => {
-        inventory.once('updated', done)
+        inventory.once('updatedEntry', done)
         inventory.emit('updateEntry', entry)
       })
 
@@ -36,7 +36,7 @@ module.exports = inventory => {
     })
 
     it('updates entries', done => {
-      inventory.once('updated', done)
+      inventory.once('updatedEntries', done)
       inventory.emit('updateEntries', entries)
     })
 

@@ -8,6 +8,8 @@ const {newInventory} = require('../src')
 const testOps = require('./fixtures')
 const {inventoryFail} = require('./testcases')
 
+const numEntries = 10
+
 describe('inventory', () => {
   it('fails to create new inventory', done => {
     const {error, numEntries} = inventoryFail
@@ -19,5 +21,5 @@ describe('inventory', () => {
       done()
     }
   })
-  testOps(newInventory(10))
+  testOps(newInventory(numEntries))
 })
