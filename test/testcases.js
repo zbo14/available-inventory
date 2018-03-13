@@ -603,7 +603,7 @@ exports.inventoryDBFails = [
       port: 1023,
       numEntries: 10
     },
-    error: new Error('opts.port should be a number > 1023')
+    error: new Error('opts.port should be a number greater than 1023')
   },
   {
     opts: {

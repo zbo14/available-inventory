@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "update entries with incoming orders, outgoing orders, and product shelf life and calculate available inventory",
   "scripts": {
-    "lint": "eslint src test",
+    "lint": "eslint src test example",
     "start": "node ./example/inventory.js",
     "test": "nyc mocha --reporter spec"
   },

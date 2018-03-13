@@ -244,9 +244,8 @@ exports.newInventoryDB = opts => {
     throw new Error('opts.host should be a non-empty string')
   }
   if (!_.isNumber(opts.port) || opts.port <= 1023) {
-    throw new Error('opts.port should be a number > 1023')
+    throw new Error('opts.port should be a number greater than 1023')
   }
-  opts.numEntries = opts.numEntries || 0
   if (!_.isNonNegativeNumber(opts.numEntries)) {
     throw new Error('opts.numEntries should be a non-negative number')
   }

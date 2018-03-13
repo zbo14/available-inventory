@@ -39,14 +39,12 @@ module.exports = entries => {
   })
   for (i = entries.length - 1; i > 0; i--) {
     for (j = i - 1; j >= 0 && entries[j].expires > i && incoming[i] < outgoing[i]; j--) {
-      if (incoming[j] > 0) {
-        v = _.max([0, _.min([available[j], incoming[j], outgoing[i] - incoming[i]])])
-        if (v > 0) {
-          incoming[i] += v
-          incoming[j] -= v
-          for (k = j; k < i; k++) {
-            if (available[k] > 0) available[k] -= _.min([available[k], v])
-          }
+      v = _.max([0, _.min([available[j], incoming[j], outgoing[i] - incoming[i]])])
+      if (v > 0) {
+        incoming[i] += v
+        incoming[j] -= v
+        for (k = j; k < i; k++) {
+          if (available[k] > 0) available[k] -= _.min([available[k], v])
         }
       }
     }

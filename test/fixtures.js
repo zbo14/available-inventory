@@ -90,6 +90,15 @@ module.exports = inventory => {
       })
       inventory.emit('updateEntry', entry)
     })
+
+    it('fails to update entries', done => {
+      inventory.once('error', err => {
+        expect(err).to.be.an('error')
+        expect(err.message).to.equal(error.message)
+        done()
+      })
+      inventory.emit('updateEntries', [entry])
+    })
   })
 
   it('fails to update entries', done => {
