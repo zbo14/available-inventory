@@ -6,22 +6,22 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 5,
         outgoing: 0,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 1,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 3,
+        date: 3,
         incoming: 3,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [5, 5, -1, 1],
@@ -31,22 +31,22 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 5,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 1,
+        date: 1,
         incoming: 3,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 0,
         outgoing: 0,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [3, 4, 3],
@@ -56,22 +56,22 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 5,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 1,
+        date: 1,
         incoming: 3,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 0,
         outgoing: 3,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [1, 1, 0],
@@ -81,28 +81,28 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 6,
         outgoing: 5,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 1,
+        date: 1,
         incoming: 4,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 2,
         outgoing: 3,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 3,
+        date: 3,
         incoming: 3,
         outgoing: 1,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [1, 2, 2, 4],
@@ -112,28 +112,28 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 6,
         outgoing: 5,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 1,
+        date: 1,
         incoming: 4,
         outgoing: 2,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 2,
+        date: 2,
         incoming: 2,
         outgoing: 3,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 3,
+        date: 3,
         incoming: 3,
         outgoing: 1,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [1, 2, 2, 4],
@@ -143,28 +143,28 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 5,
         outgoing: 4,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 1,
+        date: 1,
         incoming: 3,
         outgoing: 4,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 2,
         outgoing: 3,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 3,
+        date: 3,
         incoming: 2,
         outgoing: 1,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [0, 0, -1, 1],
@@ -174,28 +174,28 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 5,
         outgoing: 4,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 1,
+        date: 1,
         incoming: 3,
         outgoing: 4,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 2,
         outgoing: 3,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 3,
+        date: 3,
         incoming: 2,
         outgoing: 1,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [0, 0, -1, 1],
@@ -205,28 +205,28 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 1,
         outgoing: 2,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 1,
+        date: 1,
         incoming: 2,
         outgoing: 3,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 3,
         outgoing: 4,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 3,
+        date: 3,
         incoming: 4,
         outgoing: 5,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [-1, -1, -1, -1],
@@ -236,28 +236,28 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 1,
         outgoing: 2,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 1,
+        date: 1,
         incoming: 2,
         outgoing: 3,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 2,
+        date: 2,
         incoming: 3,
         outgoing: 4,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 3,
+        date: 3,
         incoming: 4,
         outgoing: 5,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [-1, -1, -1],
@@ -267,34 +267,34 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 2,
         outgoing: 0,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 1,
+        date: 1,
         incoming: 1,
         outgoing: 1,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 2,
+        date: 2,
         incoming: 3,
         outgoing: 4,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 3,
+        date: 3,
         incoming: 5,
         outgoing: 4,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 4,
+        date: 4,
         incoming: 4,
         outgoing: 6,
-        shelfLife: 3
+        shelflife: 3
       }
     ],
     available: [0, 0, 0, 0, 0],
@@ -304,34 +304,34 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 1,
         outgoing: 0,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 1,
+        date: 1,
         incoming: 1,
         outgoing: 1,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 2,
+        date: 2,
         incoming: 3,
         outgoing: 4,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 3,
+        date: 3,
         incoming: 5,
         outgoing: 4,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 4,
+        date: 4,
         incoming: 4,
         outgoing: 6,
-        shelfLife: 3
+        shelflife: 3
       }
     ],
     available: [0, 0, 0, 0, -1],
@@ -341,40 +341,40 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 3,
         outgoing: 1,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 1,
+        date: 1,
         incoming: 1,
         outgoing: 2,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 2,
+        date: 2,
         incoming: 2,
         outgoing: 0,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 3,
+        date: 3,
         incoming: 3,
         outgoing: 1,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 4,
+        date: 4,
         incoming: 4,
         outgoing: 5,
-        shelfLife: 3
+        shelflife: 3
       },
       {
-        index: 5,
+        date: 5,
         incoming: 2,
         outgoing: 1,
-        shelfLife: 3
+        shelflife: 3
       }
     ],
     available: [1, 1, 3, 4, 4, 5],
@@ -384,22 +384,22 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 5,
         outgoing: 1,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 1,
+        date: 1,
         incoming: 2,
         outgoing: 3,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 1,
         outgoing: 3,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [1, 1, 0],
@@ -409,28 +409,28 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 5,
         outgoing: 0,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 1,
+        date: 1,
         incoming: 2,
         outgoing: 4,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 1,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 3,
+        date: 3,
         incoming: 3,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [2, 2, 1, 2],
@@ -440,40 +440,40 @@ exports.cases = [
   {
     entries: [
       {
-        index: 0,
+        date: 0,
         incoming: 3,
         outgoing: 1,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 1,
+        date: 1,
         incoming: 1,
         outgoing: 2,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 2,
+        date: 2,
         incoming: 2,
         outgoing: 0,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 3,
+        date: 3,
         incoming: 3,
         outgoing: 1,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 4,
+        date: 4,
         incoming: 4,
         outgoing: 5,
-        shelfLife: 2
+        shelflife: 2
       },
       {
-        index: 5,
+        date: 5,
         incoming: 2,
         outgoing: 1,
-        shelfLife: 2
+        shelflife: 2
       }
     ],
     available: [1, 1, 3, 3, 2, 3],
@@ -484,12 +484,12 @@ exports.cases = [
 
 exports.getEntryFails = [
   {
-    index: -1,
-    error: new Error('index should be a non-negative number')
+    date: -1,
+    error: new Error('date should be a non-negative number')
   },
   {
-    index: 11,
-    error: new Error('index is out of range')
+    date: 11,
+    error: new Error('date is out of range')
   }
 ]
 
@@ -523,30 +523,39 @@ exports.updateEntryFails = [
   },
   {
     entry: {
-      index: 0,
+      date: -1,
+      incoming: 5,
+      outgoing: 4,
+      shelflife: 3
+    },
+    error: new Error('entry.date should be a non-negative number')
+  },
+  {
+    entry: {
+      date: 0,
       incoming: -5,
       outgoing: 4,
-      shelfLife: 3
+      shelflife: 3
     },
     error: new Error('entry.incoming should be a non-negative number')
   },
   {
     entry: {
-      index: 0,
+      date: 0,
       incoming: 5,
       outgoing: -4,
-      shelfLife: 3
+      shelflife: 3
     },
     error: new Error('entry.outgoing should be a non-negative number')
   },
   {
     entry: {
-      index: 0,
+      date: 0,
       incoming: 5,
       outgoing: 4,
-      shelfLife: 0
+      shelflife: 0
     },
-    error: new Error('entry.shelfLife should be a positive number')
+    error: new Error('entry.shelflife should be a positive number')
   }
 ]
 
@@ -568,7 +577,6 @@ exports.inventoryDBFails = [
   {
     opts: {
       db: '',
-      name: 'test',
       host: 'localhost',
       port: 1024,
       numEntries: 10
@@ -578,17 +586,6 @@ exports.inventoryDBFails = [
   {
     opts: {
       db: 'mongodb',
-      name: '',
-      host: 'localhost',
-      port: 1024,
-      numEntries: 10
-    },
-    error: new Error('opts.name should be a non-empty string')
-  },
-  {
-    opts: {
-      db: 'mongodb',
-      name: 'test',
       host: '',
       port: 1024,
       numEntries: 10
@@ -598,7 +595,6 @@ exports.inventoryDBFails = [
   {
     opts: {
       db: 'mongodb',
-      name: 'test',
       host: 'localhost',
       port: 1023,
       numEntries: 10
@@ -608,7 +604,6 @@ exports.inventoryDBFails = [
   {
     opts: {
       db: 'mongodb',
-      name: 'test',
       host: 'localhost',
       port: 1024,
       numEntries: -10
@@ -618,7 +613,6 @@ exports.inventoryDBFails = [
   {
     opts: {
       db: 'mysql',
-      name: 'test',
       host: 'localhost',
       port: 1024,
       numEntries: 10

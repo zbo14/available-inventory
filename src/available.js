@@ -2,6 +2,7 @@
 
 /* eslint-env node, es6 */
 
+const {expires} = require('./entry')
 const _ = require('./util')
 
 module.exports = entries => {
@@ -14,7 +15,7 @@ module.exports = entries => {
   incoming[0] -= v
   outgoing[0] -= v
   for (i = 1; i < entries.length; i++) {
-    for (j = i - 1; j >= 0 && entries[j].expires > i; j--) {}
+    for (j = i - 1; j >= 0 && expires(entries[j]) > i; j--) {}
     for (j = j + 1; j < i && outgoing[i] > 0; j++) {
       if (incoming[j] > 0) {
         v = _.min([incoming[j], outgoing[i]])
@@ -38,7 +39,7 @@ module.exports = entries => {
     outgoing[i] = entry.outgoing
   })
   for (i = entries.length - 1; i > 0; i--) {
-    for (j = i - 1; j >= 0 && entries[j].expires > i && incoming[i] < outgoing[i]; j--) {
+    for (j = i - 1; j >= 0 && expires(entries[j]) > i && incoming[i] < outgoing[i]; j--) {
       v = _.max([0, _.min([available[j], incoming[j], outgoing[i] - incoming[i]])])
       if (v > 0) {
         incoming[i] += v

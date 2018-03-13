@@ -7,15 +7,8 @@ const {it} = require('mocha')
 const t = require('./testcases')
 const _ = require('../src/util')
 
-const checkEntry = (result, entry) => {
-  expect(result.incoming).to.equal(entry.incoming)
-  expect(result.outgoing).to.equal(entry.outgoing)
-  expect(result.index).to.equal(entry.index)
-  expect(result.expires).to.equal(entry.index + entry.shelfLife)
-}
-
 const sharedResults = (results, entries) => {
-  return _.filter(results, result => _.find(entries, entry => entry.index === result.index))
+  return _.filter(results, result => _.find(entries, entry => entry.date === result.date))
 }
 
 module.exports = inventory => {
@@ -28,10 +21,10 @@ module.exports = inventory => {
 
       it('checks entry', done => {
         inventory.once('gotEntry', result => {
-          checkEntry(result, entry)
+          expect(result).to.deep.equal(entry)
           done()
         })
-        inventory.emit('getEntry', entry.index)
+        inventory.emit('getEntry', entry.date)
       })
     })
 
@@ -44,7 +37,7 @@ module.exports = inventory => {
       inventory.once('gotEntries', results => {
         const newEntries = entries.slice(start, end)
         const newResults = sharedResults(results, newEntries)
-        _.zipWith(newResults, newEntries, checkEntry)
+        _.zipWith(newResults, newEntries, (result, entry) => expect(result).to.deep.equal(entry))
         done()
       })
       inventory.emit('getEntries', start, end)
@@ -59,14 +52,14 @@ module.exports = inventory => {
     })
   })
 
-  _.each(t.getEntryFails, ({index, error}) => {
+  _.each(t.getEntryFails, ({date, error}) => {
     it('fails to get entry', done => {
       inventory.once('error', err => {
         expect(err).to.be.an('error')
         expect(err.message).to.equal(error.message)
         done()
       })
-      inventory.emit('getEntry', index)
+      inventory.emit('getEntry', date)
     })
   })
 

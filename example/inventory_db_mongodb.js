@@ -3,9 +3,9 @@
 /* eslint-env node, es6 */
 
 const {newInventoryDB} = require('../src')
+
 const inventory = newInventoryDB({
   db: 'mongodb',
-  name: 'example',
   host: 'localhost',
   port: 27017,
   numEntries: 4
@@ -13,22 +13,22 @@ const inventory = newInventoryDB({
 
 const entries = [
   {
-    index: 0,
+    date: 0,
     incoming: 5,
     outgoing: 0,
-    shelfLife: 2
+    shelflife: 2
   },
   {
-    index: 2,
+    date: 2,
     incoming: 1,
     outgoing: 2,
-    shelfLife: 2
+    shelflife: 2
   },
   {
-    index: 3,
+    date: 3,
     incoming: 3,
     outgoing: 2,
-    shelfLife: 2
+    shelflife: 2
   }
 ]
 
@@ -41,5 +41,5 @@ inventory.once('started', () => {
   inventory.emit('updateEntries', entries)
 })
 
-// console.logs the availability for the 4 steps:
+// console.logs the availability for the 4 dates:
 // [5, 5, -1, 1]

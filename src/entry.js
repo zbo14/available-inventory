@@ -4,21 +4,22 @@
 
 const _ = require('./util')
 
-exports.convertEntry = entry => {
-  return {
-    index: entry.index,
-    expires: entry.index + entry.shelfLife,
-    incoming: entry.incoming,
-    outgoing: entry.outgoing
-  }
-}
+/**
+ * @typedef  {Object} Entry
+ * @property {number} date
+ * @property {number} incoming
+ * @property {number} outgoing
+ * @property {number} shelflife
+ */
 
-exports.newEntry = index => {
+exports.expires = entry => entry.date + entry.shelflife
+
+exports.newEntry = date => {
   return {
-    index,
-    expires: index + 1,
+    date,
     incoming: 0,
-    outgoing: 0
+    outgoing: 0,
+    shelflife: 1
   }
 }
 
@@ -28,14 +29,14 @@ exports.newEntries = (start, end) => {
 
 exports.fillMissingEntries = (entries, start, end) => {
   const allEntries = []
-  let index = start
+  let date = start
   _.each(entries, entry => {
-    if (entry.index === index) {
+    if (entry.date === date) {
       allEntries.push(entry)
-      index++
+      date++
     } else {
-      allEntries.push(...exports.newEntries(index, entry.index), entry)
-      index = entry.index + 1
+      allEntries.push(...exports.newEntries(date, entry.date), entry)
+      date = entry.date + 1
     }
   })
   return allEntries

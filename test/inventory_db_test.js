@@ -10,13 +10,11 @@ const t = require('./testcases')
 const _ = require('../src/util')
 
 const host = 'localhost'
-const name = 'test'
 const numEntries = 10
 
 const mongoOpts = {
   db: 'mongodb',
   host,
-  name,
   port: 27017,
   numEntries
 }
@@ -24,7 +22,6 @@ const mongoOpts = {
 const postgresOpts = {
   db: 'postgresql',
   host,
-  name,
   port: 5432,
   numEntries
 }
