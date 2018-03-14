@@ -7,7 +7,7 @@ const {expect} = require('chai')
 const {newInventoryDB} = require('../src')
 const testOps = require('./fixtures')
 const t = require('./testcases')
-const _ = require('../src/util')
+const {_} = require('../src/util')
 
 const host = 'localhost'
 const numEntries = 10

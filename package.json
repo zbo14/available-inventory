@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "update entries with incoming orders, outgoing orders, and product shelf life and calculate available inventory",
   "scripts": {
-    "doc":"./node_modules/.bin/jsdoc ./README.md ./src/events.js ./src/index.js ./src/entry.js && open ./out/index.html",
+    "doc":"./node_modules/.bin/jsdoc ./README.md ./src ./src/events && open ./out/index.html",
     "lint": "./node_modules/.bin/eslint src test example",
     "start": "node ./example/inventory.js",
     "test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha --reporter spec"

@@ -2,47 +2,47 @@
 
 /* eslint-env node, es6 */
 
-const _ = require('./util')
+const {_} = require('./util')
 
-exports.date = (inventory, numEntries) => date => {
+exports.date = (emitter, numEntries) => date => {
   if (!_.isNonNegativeNumber(date)) {
-    inventory.emit('error', new Error('date should be a non-negative number'))
+    emitter.emit('error', new Error('date should be a non-negative number'))
     return false
   }
   if (numEntries > 0 && date > numEntries) {
-    inventory.emit('error', new Error('date is out of range'))
+    emitter.emit('error', new Error('date is out of range'))
     return false
   }
   return true
 }
 
-exports.entry = inventory => entry => {
+exports.entry = emitter => entry => {
   if (!_.isNonEmptyObject(entry)) {
-    inventory.emit('error', new Error('entry should be a non-empty object'))
+    emitter.emit('error', new Error('entry should be a non-empty object'))
     return false
   }
   if (!_.isNonNegativeNumber(entry.date)) {
-    inventory.emit('error', new Error('entry.date should be a non-negative number'))
+    emitter.emit('error', new Error('entry.date should be a non-negative number'))
     return false
   }
   if (!_.isNonNegativeNumber(entry.incoming)) {
-    inventory.emit('error', new Error('entry.incoming should be a non-negative number'))
+    emitter.emit('error', new Error('entry.incoming should be a non-negative number'))
     return false
   }
   if (!_.isNonNegativeNumber(entry.outgoing)) {
-    inventory.emit('error', new Error('entry.outgoing should be a non-negative number'))
+    emitter.emit('error', new Error('entry.outgoing should be a non-negative number'))
     return false
   }
   if (!_.isPositiveNumber(entry.shelflife)) {
-    inventory.emit('error', new Error('entry.shelflife should be a positive number'))
+    emitter.emit('error', new Error('entry.shelflife should be a positive number'))
     return false
   }
   return true
 }
 
-exports.entries = (inventory, validEntry) => entries => {
+exports.entries = (emitter, validEntry) => entries => {
   if (!_.isNonEmptyArray(entries)) {
-    inventory.emit('error', new Error('entries should be a non-empty array'))
+    emitter.emit('error', new Error('entries should be a non-empty array'))
     return false
   }
   for (let i = 0; i < entries.length; i++) {
@@ -51,21 +51,21 @@ exports.entries = (inventory, validEntry) => entries => {
   return true
 }
 
-exports.range = (inventory, numEntries) => (start, end) => {
+exports.range = (emitter, numEntries) => (start, end) => {
   if (!_.isNonNegativeNumber(start)) {
-    inventory.emit('error', new Error('start should be a non-negative number'))
+    emitter.emit('error', new Error('start should be a non-negative number'))
     return false
   }
   if (!_.isPositiveNumber(end)) {
-    inventory.emit('error', new Error('end should be a positive number'))
+    emitter.emit('error', new Error('end should be a positive number'))
     return false
   }
   if (numEntries > 0 && end > numEntries) {
-    inventory.emit('error', new Error('end is out of range'))
+    emitter.emit('error', new Error('end is out of range'))
     return false
   }
   if (start >= end) {
-    inventory.emit('error', new Error('end should be greater than start'))
+    emitter.emit('error', new Error('end should be greater than start'))
     return false
   }
   return true

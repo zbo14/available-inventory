@@ -617,6 +617,6 @@ exports.inventoryDBFails = [
       port: 1024,
       numEntries: 10
     },
-    error: new Error('opts.db should be "mongodb" or "postgresql"')
+    error: new Error('opts.db is not supported')
   }
 ]

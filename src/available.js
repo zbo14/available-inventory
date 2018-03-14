@@ -3,7 +3,7 @@
 /* eslint-env node, es6 */
 
 const {expires} = require('./entry')
-const _ = require('./util')
+const {_} = require('./util')
 
 module.exports = entries => {
   const available = new Array(entries.length).fill(0)

@@ -5,7 +5,7 @@
 const {expect} = require('chai')
 const {it} = require('mocha')
 const t = require('./testcases')
-const _ = require('../src/util')
+const {_} = require('../src/util')
 
 const sharedResults = (results, entries) => {
   return _.filter(results, result => _.find(entries, entry => entry.date === result.date))
