@@ -5,14 +5,14 @@
 const {expect} = require('chai')
 const {it} = require('mocha')
 const t = require('./testcases')
-const {_} = require('../src/util')
+const _ = require('../src/util')
 
 const sharedResults = (results, entries) => {
   return _.filter(results, result => _.find(entries, entry => entry.date === result.date))
 }
 
 module.exports = inventory => {
-  _.each(t.cases, ({entries, available, start, end}) => {
+  _.each(t.cases, ({entries, available, begin, end}) => {
     _.each(entries, entry => {
       it('updates entry', done => {
         inventory.once('updatedEntry', done)
@@ -35,12 +35,12 @@ module.exports = inventory => {
 
     it('checks entries', done => {
       inventory.once('gotEntries', results => {
-        const newEntries = entries.slice(start, end)
+        const newEntries = entries.slice(begin, end)
         const newResults = sharedResults(results, newEntries)
         _.zipWith(newResults, newEntries, (result, entry) => expect(result).to.deep.equal(entry))
         done()
       })
-      inventory.emit('getEntries', start, end)
+      inventory.emit('getEntries', begin, end)
     })
 
     it('gets available inventory', done => {
@@ -48,29 +48,28 @@ module.exports = inventory => {
         expect(result).to.deep.equal(available)
         done()
       })
-      inventory.emit('getAvailable', start, end)
+      inventory.emit('getAvailable', begin, end)
     })
   })
 
-  _.each(t.getEntryFails, ({date, error}) => {
-    it('fails to get entry', done => {
-      inventory.once('error', err => {
-        expect(err).to.be.an('error')
-        expect(err.message).to.equal(error.message)
-        done()
-      })
-      inventory.emit('getEntry', date)
+  it('fails to get entry', done => {
+    const {error, date} = t.getEntryFail
+    inventory.once('error', err => {
+      expect(err).to.be.an('error')
+      expect(err.message).to.equal(error.message)
+      done()
     })
+    inventory.emit('getEntry', date)
   })
 
-  _.each(t.getEntriesFails, ({start, end, error}) => {
+  _.each(t.getEntriesFails, ({begin, end, error}) => {
     it('fails to get entries', done => {
       inventory.once('error', err => {
         expect(err).to.be.an('error')
         expect(err.message).to.equal(error.message)
         done()
       })
-      inventory.emit('getEntries', start, end)
+      inventory.emit('getEntries', begin, end)
     })
   })
 

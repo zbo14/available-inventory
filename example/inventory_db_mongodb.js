@@ -5,10 +5,9 @@
 const {newInventoryDB} = require('../src')
 
 const inventory = newInventoryDB({
-  db: 'mongodb',
+  type: 'mongodb',
   host: 'localhost',
-  port: 27017,
-  numEntries: 4
+  port: 27017
 })
 
 const entries = [

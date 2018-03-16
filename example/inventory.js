@@ -4,7 +4,7 @@
 
 const {newInventory} = require('../src')
 
-const inventory = newInventory(6)
+const inventory = newInventory()
 
 const entries = [
   {
@@ -45,9 +45,11 @@ const entries = [
   }
 ]
 
-inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 6))
-inventory.once('gotAvailable', console.log)
-inventory.emit('updateEntries', entries)
+inventory.once('started', () => {
+  inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 6))
+  inventory.once('gotAvailable', console.log)
+  inventory.emit('updateEntries', entries)
+})
 
 // console.logs the availability for the 6 dates:
 // [1, 1, 3, 4, 4, 5]

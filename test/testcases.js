@@ -25,7 +25,7 @@ exports.cases = [
       }
     ],
     available: [5, 5, -1, 1],
-    start: 0,
+    begin: 0,
     end: 4
   },
   {
@@ -50,7 +50,7 @@ exports.cases = [
       }
     ],
     available: [3, 4, 3],
-    start: 0,
+    begin: 0,
     end: 3
   },
   {
@@ -75,7 +75,7 @@ exports.cases = [
       }
     ],
     available: [1, 1, 0],
-    start: 0,
+    begin: 0,
     end: 3
   },
   {
@@ -106,7 +106,7 @@ exports.cases = [
       }
     ],
     available: [1, 2, 2, 4],
-    start: 0,
+    begin: 0,
     end: 4
   },
   {
@@ -137,7 +137,7 @@ exports.cases = [
       }
     ],
     available: [1, 2, 2, 4],
-    start: 0,
+    begin: 0,
     end: 4
   },
   {
@@ -168,7 +168,7 @@ exports.cases = [
       }
     ],
     available: [0, 0, -1, 1],
-    start: 0,
+    begin: 0,
     end: 4
   },
   {
@@ -199,7 +199,7 @@ exports.cases = [
       }
     ],
     available: [0, 0, -1, 1],
-    start: 0,
+    begin: 0,
     end: 4
   },
   {
@@ -230,7 +230,7 @@ exports.cases = [
       }
     ],
     available: [-1, -1, -1, -1],
-    start: 0,
+    begin: 0,
     end: 4
   },
   {
@@ -261,7 +261,7 @@ exports.cases = [
       }
     ],
     available: [-1, -1, -1],
-    start: 1,
+    begin: 1,
     end: 4
   },
   {
@@ -298,7 +298,7 @@ exports.cases = [
       }
     ],
     available: [0, 0, 0, 0, 0],
-    start: 0,
+    begin: 0,
     end: 5
   },
   {
@@ -335,7 +335,7 @@ exports.cases = [
       }
     ],
     available: [0, 0, 0, 0, -1],
-    start: 0,
+    begin: 0,
     end: 5
   },
   {
@@ -378,7 +378,7 @@ exports.cases = [
       }
     ],
     available: [1, 1, 3, 4, 4, 5],
-    start: 0,
+    begin: 0,
     end: 6
   },
   {
@@ -403,7 +403,7 @@ exports.cases = [
       }
     ],
     available: [1, 1, 0],
-    start: 0,
+    begin: 0,
     end: 3
   },
   {
@@ -434,7 +434,7 @@ exports.cases = [
       }
     ],
     available: [2, 2, 1, 2],
-    start: 0,
+    begin: 0,
     end: 4
   },
   {
@@ -477,42 +477,31 @@ exports.cases = [
       }
     ],
     available: [1, 1, 3, 3, 2, 3],
-    start: 0,
+    begin: 0,
     end: 6
   }
 ]
 
-exports.getEntryFails = [
-  {
-    date: -1,
-    error: new Error('date should be a non-negative number')
-  },
-  {
-    date: 11,
-    error: new Error('date is out of range')
-  }
-]
+exports.getEntryFail = {
+  date: -1,
+  error: new Error('date should be a non-negative number')
+}
 
 exports.getEntriesFails = [
   {
-    start: -1,
+    begin: -1,
     end: 3,
-    error: new Error('start should be a non-negative number')
+    error: new Error('begin should be a non-negative number')
   },
   {
-    start: 0,
+    begin: 0,
     end: 0,
     error: new Error('end should be a positive number')
   },
   {
-    start: 0,
-    end: 11,
-    error: new Error('end is out of range')
-  },
-  {
-    start: 3,
+    begin: 3,
     end: 1,
-    error: new Error('end should be greater than start')
+    error: new Error('end should be greater than begin')
   }
 ]
 
@@ -564,11 +553,6 @@ exports.updateEntriesFail = {
   error: new Error('entries should be a non-empty array')
 }
 
-exports.inventoryFail = {
-  numEntries: 0,
-  error: new Error('numEntries should be a positive number')
-}
-
 exports.inventoryDBFails = [
   {
     opts: {},
@@ -576,47 +560,34 @@ exports.inventoryDBFails = [
   },
   {
     opts: {
-      db: '',
+      type: '',
       host: 'localhost',
-      port: 1024,
-      numEntries: 10
+      port: 1024
     },
-    error: new Error('opts.db should be a non-empty string')
+    error: new Error('opts.type should be a non-empty string')
   },
   {
     opts: {
-      db: 'mongodb',
+      type: 'mongodb',
       host: '',
-      port: 1024,
-      numEntries: 10
+      port: 1024
     },
     error: new Error('opts.host should be a non-empty string')
   },
   {
     opts: {
-      db: 'mongodb',
+      type: 'postgresql',
       host: 'localhost',
-      port: 1023,
-      numEntries: 10
+      port: 1023
     },
     error: new Error('opts.port should be a number greater than 1023')
   },
   {
     opts: {
-      db: 'mongodb',
+      type: 'mysql',
       host: 'localhost',
-      port: 1024,
-      numEntries: -10
+      port: 1024
     },
-    error: new Error('opts.numEntries should be a non-negative number')
-  },
-  {
-    opts: {
-      db: 'mysql',
-      host: 'localhost',
-      port: 1024,
-      numEntries: 10
-    },
-    error: new Error('opts.db is not supported')
+    error: new Error('opts.type is not supported')
   }
 ]

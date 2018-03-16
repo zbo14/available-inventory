@@ -2,15 +2,11 @@
 
 /* eslint-env node, es6 */
 
-const {_} = require('./util')
+const _ = require('./util')
 
-exports.date = (emitter, numEntries) => date => {
+exports.date = (emitter, opts) => date => {
   if (!_.isNonNegativeNumber(date)) {
     emitter.emit('error', new Error('date should be a non-negative number'))
-    return false
-  }
-  if (numEntries > 0 && date > numEntries) {
-    emitter.emit('error', new Error('date is out of range'))
     return false
   }
   return true
@@ -51,21 +47,17 @@ exports.entries = (emitter, validEntry) => entries => {
   return true
 }
 
-exports.range = (emitter, numEntries) => (start, end) => {
-  if (!_.isNonNegativeNumber(start)) {
-    emitter.emit('error', new Error('start should be a non-negative number'))
+exports.range = (emitter, opts) => (begin, end) => {
+  if (!_.isNonNegativeNumber(begin)) {
+    emitter.emit('error', new Error('begin should be a non-negative number'))
     return false
   }
   if (!_.isPositiveNumber(end)) {
     emitter.emit('error', new Error('end should be a positive number'))
     return false
   }
-  if (numEntries > 0 && end > numEntries) {
-    emitter.emit('error', new Error('end is out of range'))
-    return false
-  }
-  if (start >= end) {
-    emitter.emit('error', new Error('end should be greater than start'))
+  if (begin >= end) {
+    emitter.emit('error', new Error('end should be greater than begin'))
     return false
   }
   return true

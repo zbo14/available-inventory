@@ -26,7 +26,7 @@ Update entries in memory and calculate available inventory over a 6-step period.
 ```js
 const {newInventory} = require('../src')
 
-const inventory = newInventory(6)
+const inventory = newInventory()
 
 const entries = [
   {
@@ -67,9 +67,11 @@ const entries = [
   }
 ]
 
-inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 6))
-inventory.once('gotAvailable', console.log)
-inventory.emit('updateEntries', entries)
+inventory.once('started', () => {
+  inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 6))
+  inventory.once('gotAvailable', console.log)
+  inventory.emit('updateEntries', entries)
+})
 
 // console.logs the availability for the 6 dates:
 // [1, 1, 3, 4, 4, 5]
@@ -89,10 +91,9 @@ For this example, mongod should be running on 'mongodb://localhost:27017'.
 const {newInventoryDB} = require('../src')
 
 const inventory = newInventoryDB({
-  db: 'mongodb',
+  type: 'mongodb',
   host: 'localhost',
-  port: 27017,
-  numEntries: 4
+  port: 27017
 })
 
 const entries = [
@@ -139,10 +140,9 @@ For this example, pg_ctl should be running on 'postgres://localhost:5432' and th
 const {newInventoryDB} = require('../src')
 
 const inventory = newInventoryDB({
-  db: 'postgresql',
+  type: 'postgresql',
   host: 'localhost',
-  port: 5432,
-  numEntries: 4
+  port: 5432
 })
 
 const entries = [

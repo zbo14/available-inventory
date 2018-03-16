@@ -2,7 +2,7 @@
 
 /* eslint-env node, es6 */
 
-const {_} = require('./util')
+const _ = require('./util')
 
 /**
  * @typedef  {Object} Entry
@@ -27,23 +27,29 @@ exports.newEntries = (begin, end) => {
   return _.map(_.range(begin, end), exports.newEntry)
 }
 
-exports.updateEntry = entries => entry => {
-  entries[entry.date].incoming = entry.incoming
-  entries[entry.date].outgoing = entry.outgoing
-  entries[entry.date].shelflife = entry.shelflife
+exports.entryUpdater = entries => entry => {
+  for (let i = 0; i < entries.length; i++) {
+    if (entries[i].date === entry.date) {
+      entries[i] = entry
+      return
+    } else if (entries[i].date > entry.date) {
+      entries.splice(i, 0, entry)
+      return
+    }
+  }
+  entries.push(entry)
 }
 
 exports.fillMissingEntries = (entries, begin, end) => {
   const allEntries = []
-  let date = begin
-  _.each(entries, entry => {
-    if (entry.date === date) {
-      allEntries.push(entry)
+  for (let date = begin, i = 0; date < end; i++) {
+    if (entries[i].date === date) {
+      allEntries.push(entries[i])
       date++
-    } else {
-      allEntries.push(...exports.newEntries(date, entry.date), entry)
-      date = entry.date + 1
+    } else if (entries[i].date > date) {
+      allEntries.push(...exports.newEntries(date, entries[i].date), entries[i])
+      date = entries[i].date + 1
     }
-  })
+  }
   return allEntries
 }

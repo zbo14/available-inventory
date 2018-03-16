@@ -2,8 +2,7 @@
 
 /* eslint-env node, es6 */
 
-const {updateEntry} = require('../entry')
-const {on} = require('../util')
+const {entryUpdater} = require('../entry')
 
 /**
  * Event to update a single entry.
@@ -13,36 +12,44 @@ const {on} = require('../util')
  * @fires updatedEntry
  */
 
-exports.memory = (emitter, entries, validEntry) => {
-  const updater = updateEntry(entries)
-  on(emitter, 'updateEntry', entry => {
-    if (!validEntry(entry)) return
-    updater(entry)
+exports.memory = (emitter, entries) => {
+  const update = entryUpdater(entries)
+  return entry => {
+    update(entry)
     emitter.emit('updatedEntry')
-  })
+  }
 }
 
-exports.mongodb = (emitter, collection, validEntry) => {
-  on(emitter, 'updateEntry', entry => {
-    if (!validEntry(entry)) return
+exports.mongodb = (emitter, collection) => {
+  return entry => {
     collection.updateOne({date: entry.date}, {$set: entry}, {upsert: true}, err => {
       if (err) return emitter.emit('error', err)
       emitter.emit('updatedEntry')
     })
-  })
+  }
 }
 
-exports.postgresql = (emitter, client, validEntry) => {
-  on(emitter, 'updateEntry', entry => {
-    if (!validEntry(entry)) return
+exports.postgresql = (emitter, client) => {
+  return ({date, incoming, outgoing, shelflife}) => {
     client.query(`
       INSERT INTO entries(date, incoming, outgoing, shelflife)
-      VALUES(${entry.date}, ${entry.incoming}, ${entry.outgoing}, ${entry.shelflife})
+      VALUES(${date}, ${incoming}, ${outgoing}, ${shelflife})
       ON CONFLICT (date)
-      DO UPDATE SET incoming = ${entry.incoming}, outgoing = ${entry.outgoing}, shelflife = ${entry.shelflife}`,
+      DO UPDATE SET incoming = ${incoming}, outgoing = ${outgoing}, shelflife = ${shelflife}`,
     err => {
       if (err) return emitter.emit('error', err)
       emitter.emit('updatedEntry')
     })
-  })
+  }
+}
+
+exports.redis = (emitter, client) => {
+  return entry => {
+    const key = entry.date.toString()
+    const value = JSON.stringify(entry)
+    client.set(key, value, err => {
+      if (err) return emitter.emit('error', err)
+      emitter.emit('updatedEntry')
+    })
+  }
 }

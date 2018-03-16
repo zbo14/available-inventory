@@ -7,23 +7,26 @@ const {expect} = require('chai')
 const {newInventoryDB} = require('../src')
 const testOps = require('./fixtures')
 const t = require('./testcases')
-const {_} = require('../src/util')
+const _ = require('../src/util')
 
 const host = 'localhost'
-const numEntries = 10
 
 const mongoOpts = {
-  db: 'mongodb',
+  type: 'mongodb',
   host,
-  port: 27017,
-  numEntries
+  port: 27017
 }
 
 const postgresOpts = {
-  db: 'postgresql',
+  type: 'postgresql',
   host,
-  port: 5432,
-  numEntries
+  port: 5432
+}
+
+const redisOpts = {
+  type: 'redis',
+  host,
+  port: 6379
 }
 
 describe('inventory-db', () => {
@@ -40,4 +43,5 @@ describe('inventory-db', () => {
   })
   testOps(newInventoryDB(mongoOpts))
   testOps(newInventoryDB(postgresOpts))
+  testOps(newInventoryDB(redisOpts))
 })
