@@ -6,4 +6,5 @@
  * Event fired when multiple entries have been updated.
  *
  * @event updatedEntries
+ * @param {?Error} err
  */

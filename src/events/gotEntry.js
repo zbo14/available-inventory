@@ -6,5 +6,6 @@
  * Event fired when a single entry has been retrieved.
  *
  * @event gotEntry
- * @type  {Entry}
+ * @param {?Error} err
+ * @param {?Entry} entry
  */

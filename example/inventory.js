@@ -2,9 +2,10 @@
 
 /* eslint-env node, es6 */
 
+const AsyncEmitter = require('../src/async-emitter')
 const {newInventory} = require('../src')
 
-const inventory = newInventory()
+const emitter = new AsyncEmitter()
 
 const entries = [
   {
@@ -45,11 +46,16 @@ const entries = [
   }
 ]
 
-inventory.once('started', () => {
-  inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 6))
-  inventory.once('gotAvailable', console.log)
-  inventory.emit('updateEntries', entries)
+emitter.once('ready', () => {
+  emitter.once('updatedEntries', () => emitter.emit('getAvailable', 0, 6))
+  emitter.once('gotAvailable', (err, available) => {
+    if (err) throw err
+    console.log(available)
+  })
+  emitter.emit('updateEntries', entries)
 })
+
+newInventory(emitter)
 
 // console.logs the availability for the 6 dates:
 // [1, 1, 3, 4, 4, 5]

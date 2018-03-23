@@ -3,8 +3,8 @@
 /* eslint-env node, es6 */
 
 /**
- * Event fired when a single entry has been updated.
+ * Event fired when the inventory is ready.
  *
- * @event updatedEntry
+ * @event ready
  * @param {?Error} err
  */

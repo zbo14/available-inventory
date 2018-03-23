@@ -15,18 +15,18 @@ const _ = require('../util')
  */
 
 exports.memory = (emitter, entries) => (begin, end) => {
-  emitter.emit('gotEntries', fillMissingEntries(entries, begin, end))
+  emitter.emit('gotEntries', null, fillMissingEntries(entries, begin, end))
 }
 
 exports.mongodb = (emitter, collection) => {
   return (begin, end) => {
     collection.find({date: {$gte: begin, $lt: end}}, {projection: {_id: 0}}, (err, cursor) => {
-      if (err) return emitter.emit('error', err)
+      if (err) return emitter.emit('gotEntries', err)
       cursor.sort({date: 1})
       cursor.toArray((err, entries) => {
-        if (err) return emitter.emit('error', err)
+        if (err) return emitter.emit('gotEntries', err)
         const allEntries = fillMissingEntries(entries, begin, end)
-        emitter.emit('gotEntries', allEntries)
+        emitter.emit('gotEntries', null, allEntries)
       })
     })
   }
@@ -39,9 +39,9 @@ exports.postgresql = (emitter, client) => {
       WHERE date >= ${begin} AND date < ${end}
       ORDER BY date`,
     (err, res) => {
-      if (err) return emitter.emit('error', err)
+      if (err) return emitter.emit('gotEntries', err)
       const entries = fillMissingEntries(res.rows, begin, end)
-      emitter.emit('gotEntries', entries)
+      emitter.emit('gotEntries', null, entries)
     })
   }
 }
@@ -50,12 +50,12 @@ exports.redis = (emitter, client) => {
   return (begin, end) => {
     const keys = _.map(_.range(begin, end), x => x.toString())
     client.mget(...keys, (err, arr) => {
-      if (err) return emitter.emit('error', err)
+      if (err) return emitter.emit('gotEntries', err)
       try {
         const entries = fillMissingEntries(_.map(_.filter(arr, Boolean), JSON.parse), begin, end)
-        emitter.emit('gotEntries', entries)
+        emitter.emit('gotEntries', null, entries)
       } catch (err) {
-        emitter.emit('error', err)
+        emitter.emit('gotEntries', err)
       }
     })
   }

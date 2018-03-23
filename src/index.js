@@ -2,7 +2,6 @@
 
 /* eslint-env node, es6 */
 
-const EventEmitter = require('events')
 const getAvailable = require('./events/getAvailable')
 const getEntry = require('./events/getEntry')
 const getEntries = require('./events/getEntries')
@@ -25,43 +24,43 @@ const init = (emitter, arg, type = 'memory') => {
   const updateEntryHandler = updateEntry[type](emitter, arg)
   const updateEntriesHandler = updateEntries[type](emitter, arg)
   emitter.on('getAvailable', (begin, end) => {
-    if (validRange(begin, end)) setImmediate(getAvailableHandler, begin, end)
+    if (validRange('gotAvailable', begin, end)) getAvailableHandler(begin, end)
   })
   emitter.on('getEntry', date => {
-    if (validDate(date)) setImmediate(getEntryHandler, date)
+    if (validDate('gotEntry', date)) getEntryHandler(date)
   })
   emitter.on('getEntries', (begin, end) => {
-    if (validRange(begin, end)) setImmediate(getEntriesHandler, begin, end)
+    if (validRange('gotEntries', begin, end)) getEntriesHandler(begin, end)
   })
   emitter.on('updateEntry', entry => {
-    if (validEntry(entry)) setImmediate(updateEntryHandler, entry)
+    if (validEntry('updatedEntry', entry)) updateEntryHandler(entry)
   })
   emitter.on('updateEntries', entries => {
-    if (validEntries(entries)) setImmediate(updateEntriesHandler, entries)
+    if (validEntries('updatedEntries', entries)) updateEntriesHandler(entries)
   })
-  emitter.emit('started')
+  emitter.emit('ready')
 }
 
 const mongodb = (emitter, {host, port, type}) => {
   const url = `mongodb://${host}:${port}`
   MongoClient.connect(url, (err, client) => {
-    if (err) return emitter.emit('error', err)
+    if (err) return emitter.emit('ready', err)
     const collection = client.db('inventory').collection('entries')
     collection.deleteMany({}, err => {
-      if (err) return emitter.emit('error', err)
-      setImmediate(init, emitter, collection, type)
+      if (err) return emitter.emit('ready', err)
+      init(emitter, collection, type)
     })
   })
 }
 
-const postgresql = (emitter, {host, port, type}) => {
+const postgresql = (emitter, {host, port, type}, cb) => {
   const client = new Client({
     database: 'inventory',
     host,
     port
   })
   client.connect(err => {
-    if (err) return emitter.emit('error', err)
+    if (err) return emitter.emit('ready', err)
     client.query(`
       DROP TABLE IF EXISTS entries CASCADE;
       CREATE TABLE entries (
@@ -72,71 +71,67 @@ const postgresql = (emitter, {host, port, type}) => {
         "shelflife" INT
       );`,
     err => {
-      if (err) return emitter.emit('error', err)
-      setImmediate(init, emitter, client, type)
+      if (err) return emitter.emit('ready', err)
+      init(emitter, client, type, cb)
     })
   })
 }
 
 const redis = (emitter, {host, port, type}) => {
   const client = createClient({host, port})
-  client.on('error', err => emitter.emit('error', err))
-  client.on('ready', () => {
-    client.flushdb(() => setImmediate(init, emitter, client, type))
+  client.on('error', err => {
+    throw err
   })
+  client.on('ready', () => client.flushdb(() => init(emitter, client, type)))
 }
 
 /**
- * Create a new inventory in memory.
+ * Configure a new inventory in memory.
  *
  * @function newInventory
- * @return {EventEmitter}
+ * @param {EventEmitter} emitter
  */
 
-exports.newInventory = () => {
-  const emitter = new EventEmitter()
+exports.newInventory = emitter => {
   const entries = []
-  setImmediate(init, emitter, entries)
-  return emitter
+  init(emitter, entries)
 }
 
 /**
  * @typedef {Object} Opts
  * @property {string} type - the type of database.
  * @property {string} host - the hostname for the database server.
- * @property {number} port - the port for the database server.
+ * @property {number} port - the port number for the database server.
  */
 
 /**
- * Create a new inventory in memory or with a database client.
+ * Configure a new inventory with a database client.
  *
  * @function newInventoryDB
- * @param  {Opts} opts - the configuration options for the database client.
- * @return {EventEmitter}
+ * @param {EventEmitter} emitter
+ * @param {Opts} opts - the configuration options for the database client.
  */
 
-exports.newInventoryDB = opts => {
+exports.newInventoryDB = (emitter, opts) => {
   if (!_.isNonEmptyObject(opts)) {
-    throw new Error('opts should be a non-empty object')
+    return emitter.emit('ready', new Error('opts should be a non-empty object'))
   }
   if (!_.isNonEmptyString(opts.type)) {
-    throw new Error('opts.type should be a non-empty string')
+    return emitter.emit('ready', new Error('opts.type should be a non-empty string'))
   }
   if (!_.isNonEmptyString(opts.host)) {
-    throw new Error('opts.host should be a non-empty string')
+    return emitter.emit('ready', new Error('opts.host should be a non-empty string'))
   }
   if (!_.isNumber(opts.port) || opts.port <= 1023) {
-    throw new Error('opts.port should be a number greater than 1023')
+    return emitter.emit('ready', new Error('opts.port should be a number greater than 1023'))
   }
-  const emitter = new EventEmitter()
   if (opts.type === 'mongodb') {
-    setImmediate(mongodb, emitter, opts)
+    mongodb(emitter, opts)
   } else if (opts.type === 'postgresql') {
-    setImmediate(postgresql, emitter, opts)
+    postgresql(emitter, opts)
   } else if (opts.type === 'redis') {
-    setImmediate(redis, emitter, opts)
+    redis(emitter, opts)
   } else {
-    throw new Error('opts.type is not supported')
+    emitter.emit('ready', new Error('opts.type is not supported'))
   }
-  return emitter
 }

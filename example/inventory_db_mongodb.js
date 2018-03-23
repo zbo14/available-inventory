@@ -2,13 +2,16 @@
 
 /* eslint-env node, es6 */
 
+const AsyncEmitter = require('../src/async-emitter')
 const {newInventoryDB} = require('../src')
 
-const inventory = newInventoryDB({
+const emitter = new AsyncEmitter()
+
+const opts = {
   type: 'mongodb',
   host: 'localhost',
   port: 27017
-})
+}
 
 const entries = [
   {
@@ -31,14 +34,21 @@ const entries = [
   }
 ]
 
-inventory.once('started', () => {
-  inventory.once('updatedEntries', () => inventory.emit('getAvailable', 0, 4))
-  inventory.once('gotAvailable', available => {
+emitter.once('ready', err => {
+  if (err) throw err
+  emitter.once('updatedEntries', err => {
+    if (err) throw err
+    emitter.emit('getAvailable', 0, 4)
+  })
+  emitter.once('gotAvailable', (err, available) => {
+    if (err) throw err
     console.log(available)
     process.exit()
   })
-  inventory.emit('updateEntries', entries)
+  emitter.emit('updateEntries', entries)
 })
+
+newInventoryDB(emitter, opts)
 
 // console.logs the availability for the 4 dates:
 // [5, 5, -1, 1]

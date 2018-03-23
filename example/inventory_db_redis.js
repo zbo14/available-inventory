@@ -8,34 +8,34 @@ const {newInventoryDB} = require('../src')
 const emitter = new AsyncEmitter()
 
 const opts = {
-  type: 'postgresql',
+  type: 'redis',
   host: 'localhost',
-  port: 5432
+  port: 6379
 }
 
 const entries = [
   {
     date: 0,
-    incoming: 1,
-    outgoing: 2,
-    shelflife: 3
-  },
-  {
-    date: 1,
-    incoming: 2,
-    outgoing: 3,
+    incoming: 5,
+    outgoing: 4,
     shelflife: 2
   },
   {
-    date: 2,
+    date: 1,
     incoming: 3,
     outgoing: 4,
     shelflife: 2
   },
   {
+    date: 2,
+    incoming: 2,
+    outgoing: 3,
+    shelflife: 2
+  },
+  {
     date: 3,
-    incoming: 4,
-    outgoing: 5,
+    incoming: 2,
+    outgoing: 1,
     shelflife: 2
   }
 ]
@@ -57,4 +57,4 @@ emitter.once('ready', err => {
 newInventoryDB(emitter, opts)
 
 // console.logs the availability for the 4 dates:
-// [-1, -1, -1, -1]
+// [0, 0, -1, 1]

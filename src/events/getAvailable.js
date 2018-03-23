@@ -5,7 +5,7 @@
 const available = require('../available')
 
 /**
- * Event to get available emitter within a timeframe.
+ * Event to get available inventory within a timeframe.
  *
  * @event getAvailable
  * @param  {number} begin - the beginning of the date range (inclusive).
@@ -14,6 +14,9 @@ const available = require('../available')
  */
 
 module.exports = emitter => (begin, end) => {
-  emitter.once('gotEntries', entries => emitter.emit('gotAvailable', available(entries)))
+  emitter.once('gotEntries', (err, entries) => {
+    if (err) return emitter.emit('gotAvailable', err)
+    emitter.emit('gotAvailable', null, available(entries))
+  })
   emitter.emit('getEntries', begin, end)
 }

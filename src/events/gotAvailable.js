@@ -6,5 +6,6 @@
  * Event fired when available inventory has been calculated.
  *
  * @event gotAvailable
- * @type  {number[]}
+ * @param {?Error}    err
+ * @param {?number[]} available
  */

@@ -9,7 +9,7 @@ const _ = require('../util')
  * Event to update multiple entries.
  *
  * @event updateEntries
- * @type  {Entry[]}
+ * @param {Entry[]} entries
  * @fires updatedEntries
  */
 
@@ -26,10 +26,7 @@ exports.mongodb = (emitter, collection) => {
     const writes = _.map(entries, entry => {
       return {updateOne: {filter: {date: entry.date}, update: {$set: entry}, upsert: true}}
     })
-    collection.bulkWrite(writes, err => {
-      if (err) return emitter.emit('error', err)
-      emitter.emit('updatedEntries')
-    })
+    collection.bulkWrite(writes, err => emitter.emit('updatedEntries', err))
   }
 }
 
@@ -43,19 +40,13 @@ exports.postgresql = (emitter, client) => {
       VALUES${values}
       ON CONFLICT (date)
       DO UPDATE SET incoming = entries.incoming, outgoing = entries.outgoing, shelflife = entries.shelflife`,
-    err => {
-      if (err) return emitter.emit('error', err)
-      emitter.emit('updatedEntries')
-    })
+    err => emitter.emit('updatedEntries', err))
   }
 }
 
 exports.redis = (emitter, client) => {
   return entries => {
     const kvpairs = _.flatMap(entries, entry => [entry.date.toString(), JSON.stringify(entry)])
-    client.mset(...kvpairs, err => {
-      if (err) return emitter.emit('error', err)
-      emitter.emit('updatedEntries')
-    })
+    client.mset(...kvpairs, err => emitter.emit('updatedEntries', err))
   }
 }

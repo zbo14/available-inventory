@@ -8,7 +8,7 @@ const {entryUpdater} = require('../entry')
  * Event to update a single entry.
  *
  * @event updateEntry
- * @type  {Entry}
+ * @param {Entry} entry
  * @fires updatedEntry
  */
 
@@ -23,8 +23,7 @@ exports.memory = (emitter, entries) => {
 exports.mongodb = (emitter, collection) => {
   return entry => {
     collection.updateOne({date: entry.date}, {$set: entry}, {upsert: true}, err => {
-      if (err) return emitter.emit('error', err)
-      emitter.emit('updatedEntry')
+      emitter.emit('updatedEntry', err)
     })
   }
 }
@@ -36,10 +35,7 @@ exports.postgresql = (emitter, client) => {
       VALUES(${date}, ${incoming}, ${outgoing}, ${shelflife})
       ON CONFLICT (date)
       DO UPDATE SET incoming = ${incoming}, outgoing = ${outgoing}, shelflife = ${shelflife}`,
-    err => {
-      if (err) return emitter.emit('error', err)
-      emitter.emit('updatedEntry')
-    })
+    err => emitter.emit('updatedEntry', err))
   }
 }
 
@@ -47,9 +43,6 @@ exports.redis = (emitter, client) => {
   return entry => {
     const key = entry.date.toString()
     const value = JSON.stringify(entry)
-    client.set(key, value, err => {
-      if (err) return emitter.emit('error', err)
-      emitter.emit('updatedEntry')
-    })
+    client.set(key, value, err => emitter.emit('updatedEntry', err))
   }
 }

@@ -2,6 +2,7 @@
 
 /* eslint-env node, es6 */
 
+const {describe} = require('mocha')
 const {expect} = require('chai')
 const {it} = require('mocha')
 const t = require('./testcases')
@@ -11,95 +12,102 @@ const sharedResults = (results, entries) => {
   return _.filter(results, result => _.find(entries, entry => entry.date === result.date))
 }
 
-module.exports = inventory => {
-  _.each(t.cases, ({entries, available, begin, end}) => {
-    _.each(entries, entry => {
-      it('updates entry', done => {
-        inventory.once('updatedEntry', done)
-        inventory.emit('updateEntry', entry)
+module.exports = emitter => {
+  describe('fixtures', () => {
+    _.each(t.cases, ({entries, available, begin, end}) => {
+      _.each(entries, entry => {
+        it('updates entry', done => {
+          emitter.once('updatedEntry', done)
+          emitter.emit('updateEntry', entry)
+        })
+
+        it('checks entry', done => {
+          emitter.once('gotEntry', (err, result) => {
+            expect(err).to.not.be.an('error')
+            expect(result).to.deep.equal(entry)
+            done()
+          })
+          emitter.emit('getEntry', entry.date)
+        })
       })
 
-      it('checks entry', done => {
-        inventory.once('gotEntry', result => {
-          expect(result).to.deep.equal(entry)
+      it('updates entries', done => {
+        emitter.once('updatedEntries', done)
+        emitter.emit('updateEntries', entries)
+      })
+
+      it('checks entries', done => {
+        emitter.once('gotEntries', (err, results) => {
+          expect(err).to.not.be.an('error')
+          const newEntries = entries.slice(begin, end)
+          const newResults = sharedResults(results, newEntries)
+          _.zipWith(newResults, newEntries, (result, entry) => expect(result).to.deep.equal(entry))
           done()
         })
-        inventory.emit('getEntry', entry.date)
+        emitter.emit('getEntries', begin, end)
+      })
+
+      it('gets available emitter', done => {
+        emitter.once('gotAvailable', (err, result) => {
+          expect(err).to.not.be.an('error')
+          expect(result).to.deep.equal(available)
+          done()
+        })
+        emitter.emit('getAvailable', begin, end)
       })
     })
 
-    it('updates entries', done => {
-      inventory.once('updatedEntries', done)
-      inventory.emit('updateEntries', entries)
-    })
-
-    it('checks entries', done => {
-      inventory.once('gotEntries', results => {
-        const newEntries = entries.slice(begin, end)
-        const newResults = sharedResults(results, newEntries)
-        _.zipWith(newResults, newEntries, (result, entry) => expect(result).to.deep.equal(entry))
-        done()
-      })
-      inventory.emit('getEntries', begin, end)
-    })
-
-    it('gets available inventory', done => {
-      inventory.once('gotAvailable', result => {
-        expect(result).to.deep.equal(available)
-        done()
-      })
-      inventory.emit('getAvailable', begin, end)
-    })
-  })
-
-  it('fails to get entry', done => {
-    const {error, date} = t.getEntryFail
-    inventory.once('error', err => {
-      expect(err).to.be.an('error')
-      expect(err.message).to.equal(error.message)
-      done()
-    })
-    inventory.emit('getEntry', date)
-  })
-
-  _.each(t.getEntriesFails, ({begin, end, error}) => {
-    it('fails to get entries', done => {
-      inventory.once('error', err => {
+    it('fails to get entry', done => {
+      const {error, date} = t.getEntryFail
+      emitter.once('gotEntry', (err, entry) => {
         expect(err).to.be.an('error')
         expect(err.message).to.equal(error.message)
+        expect(entry).to.equal(undefined)
         done()
       })
-      inventory.emit('getEntries', begin, end)
+      emitter.emit('getEntry', date)
     })
-  })
 
-  _.each(t.updateEntryFails, ({entry, error}) => {
-    it('fails to update entry', done => {
-      inventory.once('error', err => {
-        expect(err).to.be.an('error')
-        expect(err.message).to.equal(error.message)
-        done()
+    _.each(t.getEntriesFails, ({begin, end, error}) => {
+      it('fails to get entries', done => {
+        emitter.once('gotEntries', (err, entries) => {
+          expect(err).to.be.an('error')
+          expect(err.message).to.equal(error.message)
+          expect(entries).to.equal(undefined)
+          done()
+        })
+        emitter.emit('getEntries', begin, end)
       })
-      inventory.emit('updateEntry', entry)
+    })
+
+    _.each(t.updateEntryFails, ({entry, error}) => {
+      it('fails to update entry', done => {
+        emitter.once('updatedEntry', err => {
+          expect(err).to.be.an('error')
+          expect(err.message).to.equal(error.message)
+          done()
+        })
+        emitter.emit('updateEntry', entry)
+      })
+
+      it('fails to update entries', done => {
+        emitter.once('updatedEntries', err => {
+          expect(err).to.be.an('error')
+          expect(err.message).to.equal(error.message)
+          done()
+        })
+        emitter.emit('updateEntries', [entry])
+      })
     })
 
     it('fails to update entries', done => {
-      inventory.once('error', err => {
+      const {entries, error} = t.updateEntriesFail
+      emitter.once('updatedEntries', err => {
         expect(err).to.be.an('error')
         expect(err.message).to.equal(error.message)
         done()
       })
-      inventory.emit('updateEntries', [entry])
+      emitter.emit('updateEntries', entries)
     })
-  })
-
-  it('fails to update entries', done => {
-    const {entries, error} = t.updateEntriesFail
-    inventory.once('error', err => {
-      expect(err).to.be.an('error')
-      expect(err.message).to.equal(error.message)
-      done()
-    })
-    inventory.emit('updateEntries', entries)
   })
 }
